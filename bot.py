@@ -2,7 +2,6 @@
 
 import discord
 import gspread
-from discord.ext import commands
 import os
 
 # Variáveis de ambiente para Discord e Google
@@ -26,11 +25,11 @@ gc = gspread.service_account(filename = google_json_path)
 sheet = gc.open_by_key(SPREADSHEET_ID).get_worksheet(0)
 
 # Define bot
-client = commands.Bot(command_prefix=".")
+client = discord.Client()
 
 @client.event
 async def on_ready() :
-  await client.change_presence(status = discord.Status.idle, activity = discord.Game("Envie msg privada com sua matrícula"))
+  await client.change_presence(status = discord.Status.idle, activity = None)
   print("I am online")
 
 def busca(coluna, valor):
