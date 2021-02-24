@@ -52,7 +52,7 @@ async def on_message(message):
   if message.author == client.user:
     return
   # don't respond to channel messages
-  if message.channel.id != message.author.dm_channel.id:
+  if message.channel.type != discord.ChannelType.private:
     return
 
   user_id = message.author.name + '#' + message.author.discriminator  #str(message.author.id)
