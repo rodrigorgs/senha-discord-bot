@@ -51,6 +51,9 @@ async def on_message(message):
   # don't respond to ourselves
   if message.author == client.user:
     return
+  # don't respond to channel messages
+  if message.channel.id != message.author.dm_channel.id:
+    return
 
   user_id = message.author.name + '#' + message.author.discriminator  #str(message.author.id)
   matricula = message.content.strip()
