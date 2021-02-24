@@ -52,7 +52,7 @@ async def envia_dados(message, row):
   if ativo:
     await message.channel.send(f'Olá, {nome}!\n\nSeguem seus dados para acesso ao JUDE:\n\n**Endereço**: http://200.128.51.30/\n**Login**: {login}\n**Senha**: {senha}')
   else:
-    await message.channel.send(f'Olá, {nome}!\nVocê ainda não foi cadastrado no JUDE. Tente novamente em outro momento.')
+    await message.channel.send(f'Olá, {nome}!\nVocê ainda não foi cadastrado(a) no JUDE. Tente novamente em outro momento.')
 
 @client.event
 async def on_message(message):
