@@ -13,6 +13,8 @@ COL_MATRICULA = int(os.getenv('COL_MATRICULA') or 5)
 COL_NOME = int(os.getenv('COL_NOME') or 6)
 COL_USUARIO_DISCORD = int(os.getenv('COL_USUARIO_DISCORD') or 7)
 COL_SENHA = int(os.getenv('COL_SENHA') or 8)
+COL_ATIVO = int(os.getenv('COL_ATIVO') or 11)
+VALUE_ATIVO = os.getenv('VALUE_ATIVO') or 'S'
 
 # Cria arquivo JSON para autenticar no Google Drive
 google_json_path = 'google-service-account.json'
@@ -41,10 +43,16 @@ def busca(coluna, valor):
   return row
 
 async def envia_dados(message, row):
+  value_ativo = sheet.cell(row, COL_ATIVO).value
+  ativo = value_ativo is not None and value_ativo.strip().upper() == VALUE_ATIVO.upper()
   login = 'a' + sheet.cell(row, COL_MATRICULA).value
   nome = sheet.cell(row, COL_NOME).value
   senha = sheet.cell(row, COL_SENHA).value
-  await message.channel.send(f'Olá, {nome}!\n\nSeguem seus dados para acesso ao JUDE:\n\n**Endereço**: http://200.128.51.30/\n**Login**: {login}\n**Senha**: {senha}')
+
+  if ativo:
+    await message.channel.send(f'Olá, {nome}!\n\nSeguem seus dados para acesso ao JUDE:\n\n**Endereço**: http://200.128.51.30/\n**Login**: {login}\n**Senha**: {senha}')
+  else:
+    await message.channel.send(f'Olá, {nome}!\nVocê ainda não foi cadastrado no JUDE. Tente novamente em outro momento.')
 
 @client.event
 async def on_message(message):
