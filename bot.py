@@ -15,9 +15,10 @@ SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 # Variáveis de ambiente: colunas da planilha
 COL_MATRICULA = int(os.getenv('COL_MATRICULA') or 5)
 COL_NOME = int(os.getenv('COL_NOME') or 6)
-COL_USUARIO_DISCORD = int(os.getenv('COL_USUARIO_DISCORD') or 7)
-COL_SENHA = int(os.getenv('COL_SENHA') or 8)
-COL_ATIVO = int(os.getenv('COL_ATIVO') or 11)
+COL_ID_DISCORD = int(os.getenv('COL_ID_DISCORD') or 7)
+COL_NAME_DISCORD = int(os.getenv('COL_NAME_DISCORD') or 8)
+COL_SENHA = int(os.getenv('COL_SENHA') or 9)
+COL_ATIVO = int(os.getenv('COL_ATIVO') or 12)
 VALUE_ATIVO = os.getenv('VALUE_ATIVO') or 'S'
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL') or 'postgres://postgres:1234@db:5432/postgres'
@@ -86,23 +87,25 @@ async def on_message(message):
   
   # private message: student asking for password
   if message.channel.type == discord.ChannelType.private:
-    user_id = message.author.name + '#' + message.author.discriminator  #str(message.author.id)
+    user_id = str(message.author.id)
+    user_name = message.author.name + '#' + message.author.discriminator
     matricula = message.content.strip()
 
     try:
       # Busca pelo usuário
-      row = busca(COL_USUARIO_DISCORD, user_id)
+      row = busca(COL_ID_DISCORD, user_id)
       await envia_dados(message, row)
     except ValueError:
       # Busca pelo número de matrícula
       try:
         row = busca(COL_MATRICULA, matricula)
-        discord_user = sheet.cell(row, COL_USUARIO_DISCORD).value
+        discord_user = sheet.cell(row, COL_ID_DISCORD).value
         
         # Atualiza usuário do Discord
         if discord_user is None or len(discord_user.strip()) == 0:
           discord_user = user_id
-          sheet.update_cell(row, COL_USUARIO_DISCORD, discord_user)
+          sheet.update_cell(row, COL_ID_DISCORD, user_id)
+          sheet.update_cell(row, COL_NAME_DISCORD, user_name)
         
         # Informa senha, se usuário for correto
         if discord_user == user_id:
