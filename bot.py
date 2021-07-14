@@ -123,6 +123,9 @@ async def on_message(message):
       else:
         cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, message.author.name,))
         await message.add_reaction('✅')
+    elif message.content == '?h down':
+      cur.execute('UPDATE hands SET cleared = TRUE WHERE user_raised = %s AND cleared = FALSE', (user_id,))
+      await message.add_reaction('✅')
     elif message.content == '?h next':
       if ROLE_TEACHER not in user_roles:
         await message.channel.send('Você não tem permissão para usar esse comando.')
