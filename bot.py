@@ -2,8 +2,12 @@
 
 import discord
 import gspread
+import psycopg2
 import os
+import threading
+from datetime import datetime, timezone
 
+ROLE_TEACHER = os.getenv('ROLE_TEACHER') or 'Teacher'
 # Variáveis de ambiente para Discord e Google
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -15,6 +19,8 @@ COL_USUARIO_DISCORD = int(os.getenv('COL_USUARIO_DISCORD') or 7)
 COL_SENHA = int(os.getenv('COL_SENHA') or 8)
 COL_ATIVO = int(os.getenv('COL_ATIVO') or 11)
 VALUE_ATIVO = os.getenv('VALUE_ATIVO') or 'S'
+# Database
+DATABASE_URL = os.getenv('DATABASE_URL') or 'postgres://postgres:1234@db:5432/postgres'
 
 # Cria arquivo JSON para autenticar no Google Drive
 google_json_path = 'google-service-account.json'
@@ -28,6 +34,24 @@ sheet = gc.open_by_key(SPREADSHEET_ID).get_worksheet(0)
 
 # Define bot
 client = discord.Client()
+
+# Init database
+conn = psycopg2.connect(DATABASE_URL) #"dbname=postgres user=postgres password=1234 host=db")
+cur = conn.cursor()
+# Create table
+cur.execute('''CREATE TABLE IF NOT EXISTS hands (
+  id SERIAL PRIMARY KEY,
+  time_raised TIMESTAMP,
+  user_raised TEXT,
+  user_name_raised TEXT,
+  time_called TIMESTAMP,
+  user_called TEXT,
+  user_name_called TEXT,
+  cleared BOOLEAN DEFAULT FALSE
+)''')
+
+# Thread locking
+LOCK = threading.Lock()
 
 @client.event
 async def on_ready() :
@@ -59,34 +83,89 @@ async def on_message(message):
   # don't respond to ourselves
   if message.author == client.user:
     return
-  # don't respond to channel messages
-  if message.channel.type != discord.ChannelType.private:
-    return
+  
+  # private message: student asking for password
+  if message.channel.type == discord.ChannelType.private:
+    user_id = message.author.name + '#' + message.author.discriminator  #str(message.author.id)
+    matricula = message.content.strip()
 
-  user_id = message.author.name + '#' + message.author.discriminator  #str(message.author.id)
-  matricula = message.content.strip()
-
-  try:
-    # Busca pelo usuário
-    row = busca(COL_USUARIO_DISCORD, user_id)
-    await envia_dados(message, row)
-  except ValueError:
-    # Busca pelo número de matrícula
     try:
-      row = busca(COL_MATRICULA, matricula)
-      discord_user = sheet.cell(row, COL_USUARIO_DISCORD).value
-      
-      # Atualiza usuário do Discord
-      if discord_user is None or len(discord_user.strip()) == 0:
-        discord_user = user_id
-        sheet.update_cell(row, COL_USUARIO_DISCORD, discord_user)
-      
-      # Informa senha, se usuário for correto
-      if discord_user == user_id:
-        await envia_dados(message, row)
-      else:
-        await message.channel.send(f'Esse número de matrícula está associado a outro usuário no Discord')
+      # Busca pelo usuário
+      row = busca(COL_USUARIO_DISCORD, user_id)
+      await envia_dados(message, row)
     except ValueError:
-      await message.channel.send('Número de matrícula inválido ou não cadastrado. Digite seu número de matrícula para obter sua senha no JUDE.')
+      # Busca pelo número de matrícula
+      try:
+        row = busca(COL_MATRICULA, matricula)
+        discord_user = sheet.cell(row, COL_USUARIO_DISCORD).value
+        
+        # Atualiza usuário do Discord
+        if discord_user is None or len(discord_user.strip()) == 0:
+          discord_user = user_id
+          sheet.update_cell(row, COL_USUARIO_DISCORD, discord_user)
+        
+        # Informa senha, se usuário for correto
+        if discord_user == user_id:
+          await envia_dados(message, row)
+        else:
+          await message.channel.send(f'Esse número de matrícula está associado a outro usuário no Discord')
+      except ValueError:
+        await message.channel.send('Número de matrícula inválido ou não cadastrado. Digite seu número de matrícula para obter sua senha no JUDE.')
+    
+  else:
+    # Channel message
+    user_id = str(message.author.id)
+    user_roles = [x.name for x in message.author.roles]
+    if message.content == '?h up':  
+      cur.execute('SELECT user_raised FROM hands WHERE user_raised = %s AND cleared = FALSE', (user_id,))
+      if cur.fetchone():
+        await message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
+      else:
+        cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, message.author.name,))
+        await message.add_reaction('✅')
+    elif message.content == '?h next':
+      if ROLE_TEACHER not in user_roles:
+        await message.channel.send('Você não tem permissão para usar esse comando.')
+      else:
+        try:
+          LOCK.acquire()
+          cur.execute('SELECT user_raised FROM hands WHERE cleared = FALSE ORDER BY id')
+          ret = cur.fetchone()
+          if ret:
+            user_raised = ret[0]
+            cur.execute('UPDATE hands SET cleared = TRUE, time_called = %s, user_called = %s, user_name_called = %s WHERE user_raised = %s AND cleared = FALSE', 
+                (datetime.now(timezone.utc), str(message.author.id), message.author.name, user_raised,))
+            await message.channel.send(f'<@!{user_raised}>, é a sua vez! Seu atendimento será feito por {message.author.name}.')
+          else:
+            await message.channel.send('A fila está vazia.')
+        finally:
+          LOCK.release()
+    elif message.content == '?h list':
+      cur.execute('SELECT user_name_raised FROM hands WHERE cleared = FALSE ORDER BY id')
+      ret = cur.fetchall()
+      if ret:
+        user_list = [x[0] for x in ret]
+        user_enum_list = [f'{x[0] + 1}: {x[1]}' for x in enumerate(user_list)]
+        await message.channel.send('```' + '\n'.join(user_enum_list) + '```')
+      else:
+        await message.channel.send('A fila está vazia.')
+    elif message.content == '?h clear':
+      if ROLE_TEACHER not in user_roles:
+        await message.channel.send('Você não tem permissão para usar esse comando.')
+      else:
+        cur.execute('UPDATE hands SET cleared = TRUE WHERE cleared = FALSE')
+        await message.add_reaction('✅')
+    elif message.content == '?h report':
+      if ROLE_TEACHER not in user_roles:
+        await message.channel.send('Você não tem permissão para usar esse comando.')
+      else:
+        cur.execute('SELECT time_raised, user_name_raised, user_name_called, time_called FROM hands WHERE cleared = TRUE ORDER BY id')
+        ret = cur.fetchall()
+        if ret:
+          rows = [str(x) for x in ret]
+          await message.channel.send('```' + '\n'.join(rows) + '```')
+        else:
+          await message.channel.send('Nada a reportar.')
+
 
 client.run(DISCORD_BOT_TOKEN)

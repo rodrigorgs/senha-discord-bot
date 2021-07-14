@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  senhabot :
+    build: .
+    tty: true
+  db:
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=1234
+    image: postgres

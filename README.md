@@ -2,6 +2,8 @@
 
 Bot para Discord que informa ao usuário qual sua senha, obtida de uma planilha do Google Sheets.
 
+Além disso, ele incorpora comandos de gerenciamento de filas de atendimento do [Classroom Bot](https://top.gg/bot/691945666896855072).
+
 ## Configurando o bot no Discord
 
 <https://dev.to/p014ri5/making-and-deploying-discord-bot-with-python-4hep>
@@ -29,7 +31,7 @@ Veja a lista completa de variáveis de ambiente no arquivo `bot.py`.
 Então execute o bot:
 
 ```sh
-python bot.py
+docker-compose up --build
 ```
 
 Aguarde aparecer a mensagem `I am online`.
