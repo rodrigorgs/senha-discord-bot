@@ -118,13 +118,14 @@ async def on_message(message):
   else:
     # Channel message
     user_id = str(message.author.id)
+    user_name = message.author.display_name
     user_roles = [x.name for x in message.author.roles]
     if message.content == '?h up':  
       cur.execute('SELECT user_raised FROM hands WHERE user_raised = %s AND cleared = FALSE', (user_id,))
       if cur.fetchone():
         await message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
       else:
-        cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, message.author.name,))
+        cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, user_name,))
         await message.add_reaction('✅')
     elif message.content == '?h down':
       cur.execute('UPDATE hands SET cleared = TRUE WHERE user_raised = %s AND cleared = FALSE', (user_id,))
@@ -140,8 +141,12 @@ async def on_message(message):
           if ret:
             user_raised = ret[0]
             cur.execute('UPDATE hands SET cleared = TRUE, time_called = %s, user_called = %s, user_name_called = %s WHERE user_raised = %s AND cleared = FALSE', 
-                (datetime.now(timezone.utc), str(message.author.id), message.author.name, user_raised,))
-            await message.channel.send(f'<@!{user_raised}>, é a sua vez! Seu atendimento será feito por {message.author.name}.')
+                (datetime.now(timezone.utc), str(message.author.id), user_name, user_raised,))
+            voice_channel_text = ''
+            voice_channel = message.author.voice
+            if voice_channel is not None:
+              voice_channel_text = f' no canal <#{voice_channel.channel.id}>'
+            await message.channel.send(f'<@!{user_raised}>, é a sua vez! Seu atendimento será feito por **{user_name}**{voice_channel_text}.')
           else:
             await message.channel.send('A fila está vazia.')
         finally:
