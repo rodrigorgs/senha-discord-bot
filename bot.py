@@ -132,7 +132,7 @@ async def on_message(message):
       await message.add_reaction('✅')
     elif message.content == '?h next':
       if ROLE_TEACHER not in user_roles:
-        await message.channel.send('Você não tem permissão para usar esse comando.')
+        await message.channel.send('Você não tem permissão para usar esse comando. Digite `?h up` se quiser entrar na fila.')
       else:
         try:
           LOCK.acquire()
