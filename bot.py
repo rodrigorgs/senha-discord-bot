@@ -38,18 +38,18 @@ client = discord.Client()
 
 # Init database
 conn = psycopg2.connect(DATABASE_URL) #"dbname=postgres user=postgres password=1234 host=db")
-cur = conn.cursor()
-# Create table
-cur.execute('''CREATE TABLE IF NOT EXISTS hands (
-  id SERIAL PRIMARY KEY,
-  time_raised TIMESTAMP,
-  user_raised TEXT,
-  user_name_raised TEXT,
-  time_called TIMESTAMP,
-  user_called TEXT,
-  user_name_called TEXT,
-  cleared BOOLEAN DEFAULT FALSE
-)''')
+with conn.cursor() as cur:
+  # Create table
+  cur.execute('''CREATE TABLE IF NOT EXISTS hands (
+    id SERIAL PRIMARY KEY,
+    time_raised TIMESTAMP,
+    user_raised TEXT,
+    user_name_raised TEXT,
+    time_called TIMESTAMP,
+    user_called TEXT,
+    user_name_called TEXT,
+    cleared BOOLEAN DEFAULT FALSE
+  )''')
 
 # Thread locking
 LOCK = threading.Lock()
@@ -121,14 +121,18 @@ async def on_message(message):
     user_name = message.author.display_name
     user_roles = [x.name for x in message.author.roles]
     if message.content == '?h up':  
-      cur.execute('SELECT user_raised FROM hands WHERE user_raised = %s AND cleared = FALSE', (user_id,))
-      if cur.fetchone():
+      with conn.cursor() as cur:
+        cur.execute('SELECT user_raised FROM hands WHERE user_raised = %s AND cleared = FALSE', (user_id,))
+        ret = cur.fetchone()
+      if ret:
         await message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
       else:
-        cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, user_name,))
+        with conn.cursor() as cur:
+          cur.execute('INSERT INTO hands(time_raised, user_raised, user_name_raised) VALUES (%s, %s, %s)', (datetime.now(timezone.utc), user_id, user_name,))
         await message.add_reaction('✅')
     elif message.content == '?h down':
-      cur.execute('UPDATE hands SET cleared = TRUE WHERE user_raised = %s AND cleared = FALSE', (user_id,))
+      with conn.cursor() as cur:
+        cur.execute('UPDATE hands SET cleared = TRUE WHERE user_raised = %s AND cleared = FALSE', (user_id,))
       await message.add_reaction('✅')
     elif message.content == '?h next':
       if ROLE_TEACHER not in user_roles:
@@ -136,12 +140,14 @@ async def on_message(message):
       else:
         try:
           LOCK.acquire()
-          cur.execute('SELECT user_raised FROM hands WHERE cleared = FALSE ORDER BY id')
-          ret = cur.fetchone()
+          with conn.cursor() as cur:
+            cur.execute('SELECT user_raised FROM hands WHERE cleared = FALSE ORDER BY id')
+            ret = cur.fetchone()
           if ret:
             user_raised = ret[0]
-            cur.execute('UPDATE hands SET cleared = TRUE, time_called = %s, user_called = %s, user_name_called = %s WHERE user_raised = %s AND cleared = FALSE', 
-                (datetime.now(timezone.utc), str(message.author.id), user_name, user_raised,))
+            with conn.cursor() as cur:
+              cur.execute('UPDATE hands SET cleared = TRUE, time_called = %s, user_called = %s, user_name_called = %s WHERE user_raised = %s AND cleared = FALSE', 
+                  (datetime.now(timezone.utc), str(message.author.id), user_name, user_raised,))
             voice_channel_text = ''
             voice_channel = message.author.voice
             if voice_channel is not None:
@@ -152,8 +158,9 @@ async def on_message(message):
         finally:
           LOCK.release()
     elif message.content == '?h list':
-      cur.execute('SELECT user_name_raised FROM hands WHERE cleared = FALSE ORDER BY id')
-      ret = cur.fetchall()
+      with conn.cursor() as cur:
+        cur.execute('SELECT user_name_raised FROM hands WHERE cleared = FALSE ORDER BY id')
+        ret = cur.fetchall()
       if ret:
         user_list = [x[0] for x in ret]
         user_enum_list = [f'{x[0] + 1}: {x[1]}' for x in enumerate(user_list)]
@@ -164,14 +171,16 @@ async def on_message(message):
       if ROLE_TEACHER not in user_roles:
         await message.channel.send('Você não tem permissão para usar esse comando.')
       else:
-        cur.execute('UPDATE hands SET cleared = TRUE WHERE cleared = FALSE')
+        with conn.cursor() as cur:
+          cur.execute('UPDATE hands SET cleared = TRUE WHERE cleared = FALSE')
         await message.add_reaction('✅')
     elif message.content == '?h report':
       if ROLE_TEACHER not in user_roles:
         await message.channel.send('Você não tem permissão para usar esse comando.')
       else:
-        cur.execute('SELECT time_raised, user_name_raised, user_name_called, time_called FROM hands WHERE cleared = TRUE ORDER BY id')
-        ret = cur.fetchall()
+        with conn.cursor() as cur:
+          cur.execute('SELECT time_raised, user_name_raised, user_name_called, time_called FROM hands WHERE cleared = TRUE ORDER BY id')
+          ret = cur.fetchall()
         if ret:
           rows = [str(x) for x in ret]
           await message.channel.send('```' + '\n'.join(rows) + '```')
