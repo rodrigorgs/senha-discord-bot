@@ -120,7 +120,7 @@ async def on_message(message):
     user_id = str(message.author.id)
     user_name = message.author.display_name
     user_roles = [x.name for x in message.author.roles]
-    if not message.channel.name in ['fila-atendimento', '__teste-bot']:
+    if message.content.startswith('?h') and not message.channel.name in ['fila-atendimento', '__teste-bot']:
       await message.channel.send('Use o canal #fila-atendimento')
     elif message.content == '?h up':  
       with conn.cursor() as cur:
