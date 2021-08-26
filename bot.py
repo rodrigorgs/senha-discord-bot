@@ -120,7 +120,9 @@ async def on_message(message):
     user_id = str(message.author.id)
     user_name = message.author.display_name
     user_roles = [x.name for x in message.author.roles]
-    if message.content == '?h up':  
+    if not message.channel.name in ['fila-atendimento', '__teste-bot']:
+      await message.channel.send('Use o canal #fila-atendimento')
+    elif message.content == '?h up':  
       with conn.cursor() as cur:
         cur.execute('SELECT user_raised FROM hands WHERE user_raised = %s AND cleared = FALSE', (user_id,))
         ret = cur.fetchone()
