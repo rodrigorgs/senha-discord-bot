@@ -181,7 +181,8 @@ async def on_message(message):
         await message.channel.send('Você não tem permissão para usar esse comando.')
       else:
         with conn.cursor() as cur:
-          cur.execute('SELECT time_raised, user_name_raised, user_name_called, time_called FROM hands WHERE cleared = TRUE ORDER BY id')
+          # cur.execute('SELECT time_raised, user_name_raised, user_name_called, time_called FROM hands WHERE cleared = TRUE ORDER BY id')
+          cur.execute('SELECT user_name_called, COUNT(*) FROM hands WHERE cleared = TRUE GROUP BY user_name_called ORDER BY user_name_called')
           ret = cur.fetchall()
         if ret:
           rows = [str(x) for x in ret]
