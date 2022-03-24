@@ -50,7 +50,7 @@ with conn.cursor() as cur:
     user_called TEXT,
     user_name_called TEXT,
     cleared BOOLEAN DEFAULT FALSE
-  )''')
+  );''')
 
 # Thread locking
 LOCK = threading.Lock()
