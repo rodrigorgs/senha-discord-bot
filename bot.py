@@ -37,6 +37,7 @@ sheet = gc.open_by_key(SPREADSHEET_ID).get_worksheet(0)
 client = discord.Client()
 
 # Init database
+print("Connecting to " + DATABASE_URL)
 conn = psycopg2.connect(DATABASE_URL) #"dbname=postgres user=postgres password=1234 host=db")
 with conn.cursor() as cur:
   # Create table
