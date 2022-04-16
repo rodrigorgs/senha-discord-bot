@@ -14,7 +14,7 @@ DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 DATABASE_URL = os.getenv('DATABASE_URL') or 'postgres://postgres:1234@localhost:5432/postgres'
 GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
 
-# docker run --rm --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=1234 -d postgres
+# docker kill postgres; docker run --rm --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=1234 -d postgres
 db = DatabaseHelper(DATABASE_URL)
 db.connect()
 db.run_migrations()
