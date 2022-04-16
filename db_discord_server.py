@@ -11,3 +11,9 @@ class DiscordServer:
         cur.execute('INSERT INTO discord_server(guild_id) VALUES (%s) RETURNING id', (self.discord_server_id,))
         ret = cur.fetchone()
     return ret[0]
+  
+  def get_spreadsheet_id(self):
+    with self.db.conn.cursor() as cur:
+      cur.execute('SELECT spreadsheet_id FROM discord_server WHERE guild_id = %s', (self.discord_server_id,))
+      ret = cur.fetchone()
+      return ret[0]
