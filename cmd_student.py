@@ -5,6 +5,8 @@ from ss_config import ConfigSheet
 from ss_student import StudentSheet
 
 class StudentCmd(commands.Cog):
+  COL_STUDENT_NAME = 'STUDENT_NAME'
+
   def __init__(self, bot):
     self.bot = bot
     self.helper: SpreadsheetHelper = bot.spreadsheet
@@ -23,7 +25,8 @@ class StudentCmd(commands.Cog):
     else:
       # TODO: improve logic in link_account
       await ctx.message.add_reaction('⌛')
-      student.link_account(ctx.author.id, arg)
+      ret = student.link_account(ctx.author.id, arg)
+      student_name = ret[self.COL_STUDENT_NAME] or None
       await ctx.message.delete()
-      await ctx.send(f'Usuário {ctx.author.display_name} vinculado ao estudante.')  # TODO: name of student
+      await ctx.send(f'O usuário **{ctx.author.display_name}** foi vinculado ao estudante **{student_name}**.')
 

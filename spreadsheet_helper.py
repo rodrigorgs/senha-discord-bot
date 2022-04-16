@@ -96,8 +96,9 @@ class DataTable:
     keys = self.sheet.col_values(self.key_column_index)
     return keys.index(key) + 1
 
-  def get_values_by_key(self, key):
-    self.build_column_dict()
+  def get_values_by_key(self, key, update_index=True):
+    if update_index:
+      self.build_column_dict()
     row = self.__get_key_index(key)
     values = self.sheet.row_values(row)
     value_dict = {}
@@ -109,8 +110,13 @@ class DataTable:
     value_dict = self.get_values_by_key(key)
     return value_dict[header]
 
-  def set_value_by_key_header(self, key, header, value):
-    self.build_column_dict()
+  def set_value_by_key_header(self, key, header, value, update_index=True):
+    if update_index:
+      self.build_column_dict()
     row = self.__get_key_index(key)
     col = self.column_dict[header]
     self.sheet.update_cell(row, col, value)
+
+  def set_value_by_key_header_and_get_row(self, key, header, value):
+    self.set_value_by_key_header(key, header, value)
+    return self.get_values_by_key(key, update_index=False)
