@@ -27,6 +27,12 @@ class ConfigCmd(commands.Cog):
     await ctx.message.channel.send(f'Student worksheet: {student_worksheet_name}')
 
   @senhaconf.command()
+  async def set_spreadsheet_id(self, ctx, spreadsheet_id):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    server.set_spreadsheet_id(spreadsheet_id)
+    await ctx.message.channel.send(f'Spreadsheet ID: {spreadsheet_id}')
+
+  @senhaconf.command()
   async def reload(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()
