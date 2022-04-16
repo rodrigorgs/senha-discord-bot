@@ -22,7 +22,21 @@ class HandsCmd(commands.Cog):
       await ctx.message.channel.send('Você não tem permissão para usar esse comando. Digite `?h up` se quiser entrar na fila.')
       raise commands.CommandError('This command can only be run in fila-atendimento')
 
-  @commands.command()
+  @commands.group(pass_context = True)
+  async def h(self, ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send('''Comandos disponíveis para todos:
+
+`?h up` - entra na fila de atendimento
+`?h down` - sai da fila de atendimento
+`?h list` - lista os usuários na fila
+
+Comandos disponíveis para instrutores:
+
+`?h next` - chama o próximo da fila
+`?h clear` - limpa a fila''')
+
+  @h.command()
   async def up(self, ctx: commands.Context, *, member=None):
     await self.check_valid_channel(ctx)
     hands = Hands(self.db, ctx.message.guild.id)
@@ -33,7 +47,7 @@ class HandsCmd(commands.Cog):
     except ValueError as e:
       await ctx.message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
 
-  @commands.command()
+  @h.command()
   async def down(self, ctx: commands.Context, *, member=None):
     await self.check_valid_channel(ctx)
     
@@ -41,7 +55,7 @@ class HandsCmd(commands.Cog):
     hands.down(ctx.author.id)
     await ctx.message.add_reaction('✅')
   
-  @commands.command()
+  @h.command()
   async def next(self, ctx: commands.Context, *, member=None):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
@@ -57,7 +71,7 @@ class HandsCmd(commands.Cog):
     else:
       await ctx.message.channel.send('A fila está vazia.')
 
-  @commands.command()
+  @h.command()
   async def clear(self, ctx: commands.Context, *, member=None):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
@@ -66,7 +80,7 @@ class HandsCmd(commands.Cog):
     hands.clear();
     await ctx.message.add_reaction('✅')
 
-  @commands.command()
+  @h.command()
   async def list(self, ctx: commands.Context, *, member=None):
     await self.check_valid_channel(ctx)
 
