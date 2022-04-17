@@ -13,6 +13,20 @@ class StudentCmd(commands.Cog):
     self.db = bot.db
 
   @commands.command()
+  async def info(self, ctx):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    spreadsheet_id = server.get_spreadsheet_id()
+    config = ConfigSheet(self.helper, spreadsheet_id)
+    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    try:
+      info = student.get_info(ctx.author.id)
+      await ctx.message.add_reaction('✅')
+      await ctx.author.send(info)
+    except ValueError as e:
+      await ctx.message.add_reaction('❌')
+      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/checkin` para vincular sua conta.')
+
+  @commands.command()
   async def checkin(self, ctx, arg=None):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()
@@ -20,8 +34,8 @@ class StudentCmd(commands.Cog):
     student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
 
     if arg is None:
-      await ctx.message.delete()
-      await ctx.send(f'Uso: /checkin numero_de_matricula')
+      await ctx.message.add_reaction('❌')
+      await ctx.send(f'Uso: `/checkin N`, onde `N` é seu número de matrícula.')
     else:
       await ctx.message.add_reaction('⌛')
       
@@ -33,5 +47,3 @@ class StudentCmd(commands.Cog):
       except ValueError as e:
         await ctx.message.delete()
         await ctx.send(f'<@!{ctx.author.id}> {e}')
-
-

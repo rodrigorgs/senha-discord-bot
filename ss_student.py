@@ -2,10 +2,17 @@ class StudentSheet:
   COL_DISCORD_ID = 'DISCORD_ID'
   COL_KEY = 'STUDENT_ID'
   COL_STUDENT_ID = 'STUDENT_ID'
+  COL_INFO = 'INFO'
 
   def __init__(self, helper, spreadsheet_id, worksheet_name):
     self.helper = helper
     self.data_table = self.helper.get_data_table(spreadsheet_id, worksheet_name, self.COL_KEY, cached=False)
+
+  def get_info(self, user_discord_id):
+    user_discord_id = str(user_discord_id)
+    row_with_discord_id = self.data_table.get_values_where_header_equals(self.COL_DISCORD_ID, user_discord_id)
+    info = row_with_discord_id[self.COL_INFO].replace('\\n', '\n')
+    return info
 
   def link_account(self, user_discord_id, student_id):
     user_discord_id = str(user_discord_id)
@@ -38,4 +45,3 @@ class StudentSheet:
       else:
         ret = self.data_table.set_value_by_key_header_and_get_row(str(student_id), self.COL_DISCORD_ID, str(user_discord_id))
         return ret
-        
