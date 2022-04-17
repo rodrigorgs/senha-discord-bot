@@ -12,27 +12,34 @@ class ConfigCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
-  @commands.group(pass_context = True)
-  async def senhaconf(self, ctx):
+  @commands.group(brief='Configurações do bot')
+  @commands.has_role('Teacher')
+  async def unibot(self, ctx):
     if ctx.invoked_subcommand is None:
-      await ctx.send('''TODO: implementar documentação''')
+      await ctx.send('''Comandos disponíveis:
 
-  @senhaconf.command()
-  async def show(self, ctx):
-    server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
+`/unibot set_spreadsheet_id <value>` - Define o ID da planilha do Google Drive
+`/unibot reload` - Recarrega as configurações a partir da planilha''')
 
-    student_worksheet_name = config.get_config('STUDENT_WORKSHEET_NAME')
-    await ctx.message.channel.send(f'Student worksheet: {student_worksheet_name}')
+  # @unibot.command(brief='Exibe a configuração atual')
+  # @commands.has_role('Teacher')
+  # async def show(self, ctx):
+  #   server = DiscordServer(self.db, ctx.message.guild.id)
+  #   spreadsheet_id = server.get_spreadsheet_id()
+  #   config = ConfigSheet(self.helper, spreadsheet_id)
 
-  @senhaconf.command()
+  #   student_worksheet_name = config.get_config('STUDENT_WORKSHEET_NAME')
+  #   await ctx.message.channel.send(f'Student worksheet: {student_worksheet_name}')
+
+  @unibot.command(brief='Define o ID da planilha do Google Drive')
+  @commands.has_role('Teacher')
   async def set_spreadsheet_id(self, ctx, spreadsheet_id):
     server = DiscordServer(self.db, ctx.message.guild.id)
     server.set_spreadsheet_id(spreadsheet_id)
     await ctx.message.channel.send(f'Spreadsheet ID: {spreadsheet_id}')
 
-  @senhaconf.command()
+  @unibot.command(brief='Recarrega as configurações a partir da planilha')
+  @commands.has_role('Teacher')
   async def reload(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()

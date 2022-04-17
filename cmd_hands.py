@@ -22,22 +22,22 @@ class HandsCmd(commands.Cog):
       await ctx.message.channel.send('Você não tem permissão para usar esse comando. Digite `?h up` se quiser entrar na fila.')
       raise commands.CommandError('This command can only be run in fila-atendimento')
 
-  @commands.group(pass_context = True)
+  @commands.group(brief='Comandos para a fila de atendimento')
   async def h(self, ctx):
     if ctx.invoked_subcommand is None:
         await ctx.send('''Comandos disponíveis para todos:
 
-`?h up` - entra na fila de atendimento
-`?h down` - sai da fila de atendimento
-`?h list` - lista os usuários na fila
+`/h up` - entra na fila de atendimento
+`/h down` - sai da fila de atendimento
+`/h list` - lista os usuários na fila
 
 Comandos disponíveis para instrutores:
 
-`?h next` - chama o próximo da fila
-`?h clear` - limpa a fila''')
+`/h next` - chama o próximo da fila
+`/h clear` - limpa a fila''')
 
-  @h.command()
-  async def up(self, ctx: commands.Context, *, member=None):
+  @h.command(brief='Entra na fila de atendimento')
+  async def up(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     hands = Hands(self.db, ctx.message.guild.id)
 
@@ -47,16 +47,16 @@ Comandos disponíveis para instrutores:
     except ValueError as e:
       await ctx.message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
 
-  @h.command()
-  async def down(self, ctx: commands.Context, *, member=None):
+  @h.command(brief='Sai da fila de atendimento')
+  async def down(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     
     hands = Hands(self.db, ctx.message.guild.id)
     hands.down(ctx.author.id)
     await ctx.message.add_reaction('✅')
   
-  @h.command()
-  async def next(self, ctx: commands.Context, *, member=None):
+  @h.command(brief='Chama o próximo da fila')
+  async def next(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
 
@@ -71,8 +71,8 @@ Comandos disponíveis para instrutores:
     else:
       await ctx.message.channel.send('A fila está vazia.')
 
-  @h.command()
-  async def clear(self, ctx: commands.Context, *, member=None):
+  @h.command(brief='Limpa a fila')
+  async def clear(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
     
@@ -80,8 +80,8 @@ Comandos disponíveis para instrutores:
     hands.clear();
     await ctx.message.add_reaction('✅')
 
-  @h.command()
-  async def list(self, ctx: commands.Context, *, member=None):
+  @h.command(brief='Lista os usuários na fila')
+  async def list(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
 
     hands = Hands(self.db, ctx.message.guild.id)

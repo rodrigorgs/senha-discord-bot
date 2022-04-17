@@ -12,7 +12,7 @@ class StudentCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
-  @commands.command()
+  @commands.command(brief='Obtém informações personalizadas sobre a disciplina')
   async def info(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()
@@ -26,7 +26,7 @@ class StudentCmd(commands.Cog):
       await ctx.message.add_reaction('❌')
       await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/checkin` para vincular sua conta.')
 
-  @commands.command()
+  @commands.command(brief='Vincula sua conta do Discord a um número de matrícula')
   async def checkin(self, ctx, arg=None):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()
