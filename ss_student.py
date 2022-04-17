@@ -1,15 +1,16 @@
 from collections import defaultdict
 
 class StudentSheet:
+  SHEET_STUDENTS = 'STUDENTS'
   COL_DISCORD_ID = 'DISCORD_ID'
   COL_KEY = 'STUDENT_ID'
   COL_STUDENT_ID = 'STUDENT_ID'
   COL_TEAM_ID = 'TEAM_ID'
   COL_INFO = 'INFO'
 
-  def __init__(self, helper, spreadsheet_id, worksheet_name):
+  def __init__(self, helper, spreadsheet_id):
     self.helper = helper
-    self.data_table = self.helper.get_data_table(spreadsheet_id, worksheet_name, self.COL_KEY, cached=False)
+    self.data_table = self.helper.get_data_table(spreadsheet_id, self.SHEET_STUDENTS, self.COL_KEY, cached=False)
 
   def get_info(self, user_discord_id):
     user_discord_id = str(user_discord_id)

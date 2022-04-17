@@ -16,9 +16,7 @@ class StudentCmd(commands.Cog):
   @commands.command(brief='Exibe equipes')
   async def equipes(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     teams = student.get_teams()
     msg = ''
@@ -36,9 +34,7 @@ class StudentCmd(commands.Cog):
   @commands.command(brief='Sai da equipe atual')
   async def sai(self, ctx, equipe=None):
     server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     student.set_team(ctx.message.author.id, '')
     await ctx.message.add_reaction('✅')
@@ -59,9 +55,7 @@ class StudentCmd(commands.Cog):
       return
 
     server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     equipe = str(int(equipe))    
     try:
@@ -74,9 +68,7 @@ class StudentCmd(commands.Cog):
   @commands.command(brief='Obtém informações personalizadas sobre a disciplina')
   async def info(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    student = StudentSheet(self.helper, server.get_spreadsheet_id())
     try:
       info = student.get_info(ctx.author.id)
       await ctx.message.add_reaction('✅')
@@ -88,9 +80,7 @@ class StudentCmd(commands.Cog):
   @commands.command(brief='Vincula sua conta do Discord a um número de matrícula')
   async def checkin(self, ctx, arg=None):
     server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+    student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     if arg is None:
       await ctx.message.add_reaction('❌')
