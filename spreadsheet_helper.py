@@ -109,11 +109,16 @@ class DataTable:
     values = self.sheet.col_values(col)
     return values
 
+  def __find_first(self, header, value):
+    col_values = self.get_values_by_header(header, update_index=False)
+    row_index = col_values.index(value) + 1
+    return row_index
+
   def get_values_where_header_equals(self, header, key, update_index=True):
     if update_index:
       self.build_column_dict()
-    col_values = self.get_values_by_header(header, update_index=False)
-    row_index = col_values.index(key) + 1
+    
+    row_index = self.__find_first(header, key)
     values = self.sheet.row_values(row_index)
     return self.__row_to_dict(values)
 
@@ -134,6 +139,13 @@ class DataTable:
     row = self.__get_key_index(key)
     col = self.column_dict[header]
     self.sheet.update_cell(row, col, value)
+
+  def when_header_is_value_set_header_to_value(self, when_header, when_value, set_header, set_value, update_index=True):
+    if update_index:
+      self.build_column_dict()
+    row = self.__find_first(when_header, when_value)
+    col = self.column_dict[set_header]
+    self.sheet.update_cell(row, col, set_value)
 
   def set_value_by_key_header_and_get_row(self, key, header, value, update_index=True):
     if update_index:

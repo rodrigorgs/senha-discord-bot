@@ -12,6 +12,34 @@ class StudentCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
+  @commands.command(brief='Entra em uma equipe')
+  async def entra(self, ctx, equipe=None):
+    try:
+      if equipe is None:
+        raise commands.CommandError()
+      try:
+        num_equipe = int(equipe)
+        if not 1 <= num_equipe <= 20:
+          raise commands.CommandError()
+      except Exception:
+        raise commands.CommandError()
+    except commands.CommandError:
+      await ctx.send('Uso: `/entra <equipe>`, onde <equipe> é um número de 1 a 20')
+      return
+
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    spreadsheet_id = server.get_spreadsheet_id()
+    config = ConfigSheet(self.helper, spreadsheet_id)
+    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+
+    equipe = str(int(equipe))    
+    try:
+      student.set_team(ctx.message.author.id, equipe)
+      await ctx.message.add_reaction('✅')
+    except ValueError:
+      await ctx.send('Você precisa vincular seu usuário Discord a uma matrícula; para isso, use o comando `/checkin <matrícula>`')
+      return
+
   @commands.command(brief='Obtém informações personalizadas sobre a disciplina')
   async def info(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
