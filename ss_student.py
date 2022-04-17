@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 class StudentSheet:
   COL_DISCORD_ID = 'DISCORD_ID'
   COL_KEY = 'STUDENT_ID'
@@ -14,6 +16,16 @@ class StudentSheet:
     row_with_discord_id = self.data_table.get_values_where_header_equals(self.COL_DISCORD_ID, user_discord_id)
     info = row_with_discord_id[self.COL_INFO].replace('\\n', '\n')
     return info
+
+  def get_teams(self):
+    teams = defaultdict(list)
+    team_ids = [int(x) for x in self.data_table.get_values_by_header(self.COL_TEAM_ID)]
+    user_ids = self.data_table.get_values_by_header(self.COL_DISCORD_ID)
+    for i in range(len(team_ids)):
+      team_id = team_ids[i]
+      user_id = user_ids[i]
+      teams[team_id].append(user_id)
+    return teams
 
   def set_team(self, user_discord_id, team_id):
     user_discord_id = str(user_discord_id)

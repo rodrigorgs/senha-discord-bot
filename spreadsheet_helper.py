@@ -107,11 +107,11 @@ class DataTable:
       self.build_column_dict()
     col = self.column_dict[header]
     values = self.sheet.col_values(col)
-    return values
+    return values[1:]
 
   def __find_first(self, header, value):
     col_values = self.get_values_by_header(header, update_index=False)
-    row_index = col_values.index(value) + 1
+    row_index = col_values.index(value) + 2
     return row_index
 
   def get_values_where_header_equals(self, header, key, update_index=True):

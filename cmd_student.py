@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from spreadsheet_helper import SpreadsheetHelper
 from db_discord_server import DiscordServer
@@ -11,6 +12,36 @@ class StudentCmd(commands.Cog):
     self.bot = bot
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
+
+  @commands.command(brief='Exibe equipes')
+  async def equipes(self, ctx):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    spreadsheet_id = server.get_spreadsheet_id()
+    config = ConfigSheet(self.helper, spreadsheet_id)
+    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+
+    teams = student.get_teams()
+    msg = ''
+    for team_id in sorted(teams.keys()):
+      user_ids = teams[team_id]
+      user_mentions = [f'<@{user_id}>' for user_id in user_ids]
+      msg += f'**Equipe {team_id}**: ' + ', '.join(user_mentions) + '\n'
+
+    if len(msg) == 0:
+      msg = 'Nenhuma equipe encontrada.'
+
+    am = discord.AllowedMentions(users=False,)
+    await ctx.send(msg, allowed_mentions=am)
+
+  @commands.command(brief='Sai da equipe atual')
+  async def sai(self, ctx, equipe=None):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    spreadsheet_id = server.get_spreadsheet_id()
+    config = ConfigSheet(self.helper, spreadsheet_id)
+    student = StudentSheet(self.helper, spreadsheet_id, config.get_config('STUDENT_WORKSHEET_NAME'))
+
+    student.set_team(ctx.message.author.id, '')
+    await ctx.message.add_reaction('✅')
 
   @commands.command(brief='Entra em uma equipe')
   async def entra(self, ctx, equipe=None):
