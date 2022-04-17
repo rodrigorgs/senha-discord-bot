@@ -96,15 +96,33 @@ class DataTable:
     keys = self.sheet.col_values(self.key_column_index)
     return keys.index(key) + 1
 
+  def __row_to_dict(self, row):
+    value_dict = {}
+    for i in range(len(self.col_headers)):
+      value_dict[self.col_headers[i]] = row[i]
+    return value_dict
+
+  def get_values_by_header(self, header, update_index=True):
+    if update_index:
+      self.build_column_dict()
+    col = self.column_dict[header]
+    values = self.sheet.col_values(col)
+    return values
+
+  def get_values_where_header_equals(self, header, key, update_index=True):
+    if update_index:
+      self.build_column_dict()
+    col_values = self.get_values_by_header(header, update_index=False)
+    row_index = col_values.index(key) + 1
+    values = self.sheet.row_values(row_index)
+    return self.__row_to_dict(values)
+
   def get_values_by_key(self, key, update_index=True):
     if update_index:
       self.build_column_dict()
     row = self.__get_key_index(key)
     values = self.sheet.row_values(row)
-    value_dict = {}
-    for i in range(len(self.col_headers)):
-      value_dict[self.col_headers[i]] = values[i]
-    return value_dict
+    return self.__row_to_dict(values)
 
   def get_value_by_key_header(self, key, header):
     value_dict = self.get_values_by_key(key)
@@ -117,6 +135,8 @@ class DataTable:
     col = self.column_dict[header]
     self.sheet.update_cell(row, col, value)
 
-  def set_value_by_key_header_and_get_row(self, key, header, value):
+  def set_value_by_key_header_and_get_row(self, key, header, value, update_index=True):
+    if update_index:
+      self.build_column_dict()
     self.set_value_by_key_header(key, header, value)
     return self.get_values_by_key(key, update_index=False)

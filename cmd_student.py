@@ -23,10 +23,15 @@ class StudentCmd(commands.Cog):
       await ctx.message.delete()
       await ctx.send(f'Uso: /checkin numero_de_matricula')
     else:
-      # TODO: improve logic in link_account
       await ctx.message.add_reaction('⌛')
-      ret = student.link_account(ctx.author.id, arg)
-      student_name = ret[self.COL_STUDENT_NAME] or None
-      await ctx.message.delete()
-      await ctx.send(f'O usuário **{ctx.author.display_name}** foi vinculado ao estudante **{student_name}**.')
+      
+      try:
+        ret = student.link_account(ctx.author.id, arg)
+        student_name = ret[self.COL_STUDENT_NAME] or None
+        await ctx.message.delete()
+        await ctx.send(f'O usuário <@!{ctx.author.id}> foi vinculado ao estudante **{student_name}**.')
+      except ValueError as e:
+        await ctx.message.delete()
+        await ctx.send(f'<@!{ctx.author.id}> {e}')
+
 
