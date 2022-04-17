@@ -8,6 +8,7 @@ from spreadsheet_helper import SpreadsheetHelper
 from cmd_config import ConfigCmd
 from cmd_hands import HandsCmd
 from cmd_student import StudentCmd
+from cmd_team import TeamCmd
 import os
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
@@ -29,6 +30,7 @@ bot.spreadsheet = spreadsheet_helper
 bot.add_cog(HandsCmd(bot))
 bot.add_cog(ConfigCmd(bot))
 bot.add_cog(StudentCmd(bot))
+bot.add_cog(TeamCmd(bot))
 print('Starting bot...')
 bot.add_listener(on_ready)
 bot.run(DISCORD_BOT_TOKEN)

@@ -129,9 +129,18 @@ class DataTable:
     values = self.sheet.row_values(row)
     return self.__row_to_dict(values)
 
-  def get_value_by_key_header(self, key, header):
+  def get_value_by_key_header(self, key, header, update_index=True):
+    if update_index:
+      self.build_column_dict()
     value_dict = self.get_values_by_key(key)
     return value_dict[header]
+
+  def select_col_where_col_is_value(self, select_header, when_header, when_value, update_index=True):
+    if update_index:
+      self.build_column_dict()
+    row = self.__find_first(when_header, when_value)
+    col = self.column_dict[select_header]
+    return self.sheet.cell(row, col).value
 
   def set_value_by_key_header(self, key, header, value, update_index=True):
     if update_index:

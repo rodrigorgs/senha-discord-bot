@@ -18,6 +18,14 @@ class StudentSheet:
     info = row_with_discord_id[self.COL_INFO].replace('\\n', '\n')
     return info
 
+  def get_team(self, user_discord_id):
+    user_discord_id = str(user_discord_id)
+    try:
+      return self.data_table.select_col_where_col_is_value(self.COL_TEAM_ID, self.COL_DISCORD_ID, user_discord_id)
+    except Exception as e:
+      print(e)
+      return None
+
   def get_teams(self):
     teams = defaultdict(list)
     team_ids = [int(x) for x in self.data_table.get_values_by_header(self.COL_TEAM_ID)]
