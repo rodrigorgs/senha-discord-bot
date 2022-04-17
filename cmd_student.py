@@ -3,6 +3,7 @@ from spreadsheet_helper import SpreadsheetHelper
 from db_discord_server import DiscordServer
 from ss_config import ConfigSheet
 from ss_student import StudentSheet
+from discord_slash import cog_ext, SlashContext
 
 class StudentCmd(commands.Cog):
   COL_STUDENT_NAME = 'STUDENT_NAME'
@@ -12,7 +13,8 @@ class StudentCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
-  @commands.command()
+  # @commands.command()
+  @cog_ext.cog_slash(name="info", description="Obtém informações sobre sua conta")
   async def info(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     spreadsheet_id = server.get_spreadsheet_id()

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-# TODO: allow admin to configure spreadsheet id
-
+from discord import Intents
 from discord.ext import commands
 from database import DatabaseHelper
 from spreadsheet_helper import SpreadsheetHelper
 from cmd_config import ConfigCmd
 from cmd_hands import HandsCmd
 from cmd_student import StudentCmd
+from discord_slash import SlashCommand
 import os
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
@@ -23,7 +23,8 @@ spreadsheet_helper = SpreadsheetHelper(GOOGLE_SERVICE_ACCOUNT_JSON)
 
 async def on_ready():
     print('Bot is online')
-bot = commands.Bot(command_prefix='/')
+
+bot = commands.Bot(command_prefix='!', self_bot=True, intents=Intents.default())
 bot.db = db
 bot.spreadsheet = spreadsheet_helper
 bot.add_cog(HandsCmd(bot))
