@@ -28,7 +28,7 @@ class StudentSheet:
 
   def get_teams(self):
     teams = defaultdict(list)
-    team_ids = [int(x) for x in self.data_table.get_values_by_header(self.COL_TEAM_ID)]
+    team_ids = [int(x) for x in self.data_table.get_values_by_header(self.COL_TEAM_ID) if x.strip().isdigit()]
     user_ids = self.data_table.get_values_by_header(self.COL_DISCORD_ID)
     for i in range(len(team_ids)):
       team_id = team_ids[i]
