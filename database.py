@@ -81,7 +81,7 @@ class DatabaseHelper:
         );''')
     elif version == 2:
       with self.conn.cursor() as cur:
-        cur.execute('''CREATE TABLE IF EXISTS discord_server (
+        cur.execute('''CREATE TABLE IF NOT EXISTS discord_server (
           id SERIAL PRIMARY KEY,
           name TEXT,
           guild_id NUMERIC,
