@@ -9,7 +9,7 @@ class TeamCmd(commands.Cog):
     self.bot = bot
     self.helper: SpreadsheetHelper = bot.spreadsheet
 
-  @commands.group(brief='Comandos para equipes')
+  @commands.command(brief='Comandos para equipes')
   async def equipe(self, ctx, team_id=None, attribute=None, value=None):
     # TODO: if attribute is None, list all attributes
     if team_id is None or attribute is None:

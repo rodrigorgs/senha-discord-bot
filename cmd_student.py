@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from spreadsheet_helper import SpreadsheetHelper
 from db_discord_server import DiscordServer
-from ss_config import ConfigSheet
 from ss_student import StudentSheet
 
 class StudentCmd(commands.Cog):
@@ -13,7 +12,7 @@ class StudentCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
-  @commands.command(brief='Exibe equipes')
+  @commands.group(brief='Exibe equipes; há subcomandos para entrar/sair de uma equipe', invoke_without_command=True)
   async def equipes(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
@@ -23,24 +22,28 @@ class StudentCmd(commands.Cog):
     for team_id in sorted(teams.keys()):
       user_ids = teams[team_id]
       user_mentions = [f'<@{user_id}>' for user_id in user_ids]
-      msg += f'**Equipe {team_id}**: ' + ', '.join(user_mentions) + '\n'
+      msg += f'> **Equipe {team_id}**: ' + ', '.join(user_mentions) + '\n'
 
     if len(msg) == 0:
-      msg = 'Nenhuma equipe encontrada.'
+      msg = 'Nenhuma equipe encontrada.\n'
+    
+    msg += '\nDigite `/equipes entrar <id da equipe>` para entrar em uma equipe.\n'
+    msg += '  (`<id da equipe>` é um número entre 1 e 20)'
+    msg += 'Digite `/equipes sair` para sair da sua equipe.\n'
 
     am = discord.AllowedMentions(users=False,)
     await ctx.send(msg, allowed_mentions=am)
 
-  @commands.command(brief='Sai da equipe atual')
-  async def sai(self, ctx, equipe=None):
+  @equipes.command(brief='Sai da equipe atual')
+  async def sair(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     student.set_team(ctx.message.author.id, '')
     await ctx.message.add_reaction('✅')
 
-  @commands.command(brief='Entra em uma equipe')
-  async def entra(self, ctx, equipe=None):
+  @equipes.command(brief='Entra em uma equipe')
+  async def entrar(self, ctx, equipe=None):
     try:
       if equipe is None:
         raise commands.CommandError()
