@@ -101,7 +101,7 @@ class DataTable:
   def __row_to_dict(self, row):
     value_dict = {}
     for i in range(len(self.col_headers)):
-      value_dict[self.col_headers[i]] = row[i]
+      value_dict[self.col_headers[i]] = row[i] if len(row) > i else ''
     return value_dict
 
   def get_values_by_header(self, header, update_index=True):
