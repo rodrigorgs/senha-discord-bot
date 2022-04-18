@@ -12,7 +12,7 @@ class StudentCmd(commands.Cog):
     self.helper: SpreadsheetHelper = bot.spreadsheet
     self.db = bot.db
 
-  @commands.group(brief='Exibe equipes; há subcomandos para entrar/sair de uma equipe', invoke_without_command=True)
+  @commands.group(brief='Exibe equipes; há subcomandos para entrar ou sair de uma equipe', invoke_without_command=True)
   async def equipes(self, ctx):
     server = DiscordServer(self.db, ctx.message.guild.id)
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
@@ -27,9 +27,9 @@ class StudentCmd(commands.Cog):
     if len(msg) == 0:
       msg = 'Nenhuma equipe encontrada.\n'
     
-    msg += '\nDigite `/equipes entrar <id da equipe>` para entrar em uma equipe.\n'
+    msg += '\nDigite `?equipes entrar <id da equipe>` para entrar em uma equipe.\n'
     msg += '  (`<id da equipe>` é um número entre 1 e 20)'
-    msg += 'Digite `/equipes sair` para sair da sua equipe.\n'
+    msg += 'Digite `?equipes sair` para sair da sua equipe.\n'
 
     am = discord.AllowedMentions(users=False,)
     await ctx.send(msg, allowed_mentions=am)
@@ -54,7 +54,7 @@ class StudentCmd(commands.Cog):
       except Exception:
         raise commands.CommandError()
     except commands.CommandError:
-      await ctx.send('Uso: `/entra <equipe>`, onde <equipe> é um número de 1 a 20')
+      await ctx.send('Uso: `?entra <equipe>`, onde <equipe> é um número de 1 a 20')
       return
 
     server = DiscordServer(self.db, ctx.message.guild.id)
@@ -65,7 +65,7 @@ class StudentCmd(commands.Cog):
       student.set_team(ctx.message.author.id, equipe)
       await ctx.message.add_reaction('✅')
     except ValueError:
-      await ctx.send('Você precisa vincular seu usuário Discord a uma matrícula; para isso, use o comando `/registrar <matrícula>`')
+      await ctx.send('Você precisa vincular seu usuário Discord a uma matrícula; para isso, use o comando `?registrar <matrícula>`')
       return
 
   @commands.command(brief='Obtém informações personalizadas sobre a disciplina')
@@ -78,7 +78,7 @@ class StudentCmd(commands.Cog):
       await ctx.author.send(info)
     except ValueError as e:
       await ctx.message.add_reaction('❌')
-      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/registrar` para vincular sua conta.')
+      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `?registrar` para vincular sua conta.')
 
   @commands.command(brief='Vincula sua conta do Discord a um número de matrícula')
   async def registrar(self, ctx, arg=None):
@@ -87,7 +87,7 @@ class StudentCmd(commands.Cog):
 
     if arg is None:
       await ctx.message.add_reaction('❌')
-      await ctx.send(f'Uso: `/registrar N`, onde `N` é seu número de matrícula.')
+      await ctx.send(f'Uso: `?registrar N`, onde `N` é seu número de matrícula.')
     else:
       await ctx.message.add_reaction('⌛')
       

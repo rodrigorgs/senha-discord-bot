@@ -18,8 +18,8 @@ class ConfigCmd(commands.Cog):
     if ctx.invoked_subcommand is None:
       await ctx.send('''Comandos disponíveis:
 
-`/unibot set_spreadsheet_id <value>` - Define o ID da planilha do Google Drive
-`/unibot reload` - Recarrega as configurações a partir da planilha''')
+`?unibot set_spreadsheet_id <value>` - Define o ID da planilha do Google Drive
+`?unibot reload` - Recarrega as configurações a partir da planilha''')
 
   # @unibot.command(brief='Exibe a configuração atual')
   # @commands.has_role('Teacher')

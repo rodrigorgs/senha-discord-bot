@@ -28,14 +28,14 @@ class HandsCmd(commands.Cog):
     if ctx.invoked_subcommand is None:
         await ctx.send('''Comandos disponíveis para todos:
 
-`/h up` - entra na fila de atendimento
-`/h down` - sai da fila de atendimento
-`/h list` - lista os usuários na fila
+`?h up` - entra na fila de atendimento
+`?h down` - sai da fila de atendimento
+`?h list` - lista os usuários na fila
 
 Comandos disponíveis para instrutores:
 
-`/h next` - chama o próximo da fila
-`/h clear` - limpa a fila''')
+`?h next` - chama o próximo da fila
+`?h clear` - limpa a fila''')
 
   @h.command(brief='Entra na fila de atendimento')
   async def up(self, ctx: commands.Context):

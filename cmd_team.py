@@ -13,7 +13,7 @@ class TeamCmd(commands.Cog):
   async def equipe(self, ctx, team_id=None, attribute=None, value=None):
     # TODO: if attribute is None, list all attributes
     if team_id is None or attribute is None:
-      await ctx.send('''Uso: `/equipe <id da equipe> <subcomando>`''')
+      await ctx.send('''Uso: `?equipe <id da equipe> <subcomando>`''')
       return
     
     server = DiscordServer(self.bot.db, ctx.message.guild.id)
