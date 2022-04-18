@@ -28,7 +28,7 @@ class StudentCmd(commands.Cog):
       msg = 'Nenhuma equipe encontrada.\n'
     
     msg += '\nDigite `?equipes entrar <id da equipe>` para entrar em uma equipe.\n'
-    msg += '  (`<id da equipe>` é um número entre 1 e 20)'
+    msg += '    (`<id da equipe>` é um número entre 1 e 20)\n'
     msg += 'Digite `?equipes sair` para sair da sua equipe.\n'
 
     am = discord.AllowedMentions(users=False,)
