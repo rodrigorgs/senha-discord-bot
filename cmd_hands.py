@@ -92,3 +92,18 @@ Comandos disponíveis para instrutores:
       await ctx.message.channel.send('\n'.join(user_list), allowed_mentions=discord.AllowedMentions(users=False))
     else:
       await ctx.message.channel.send('A fila está vazia.')
+
+  @h.command(brief='Exibe estatísticas de atendimento')
+  async def report(self, ctx):
+    await self.check_role_teacher(ctx)
+
+    hands = Hands(self.db, ctx.message.guild.id)
+    l = hands.report()
+    msg = ''
+    for row in l:
+      msg += f'<@{row["user_id"]}>: {row["n"]}\n'
+
+    if len(msg) == 0:
+      msg = 'Nada a reportar'
+
+    await ctx.send(msg, allowed_mentions=discord.AllowedMentions(users=False))

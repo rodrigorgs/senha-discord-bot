@@ -85,3 +85,9 @@ class Hands:
         (self.discord_server_fk,))
       ret = cur.fetchall()
       return [row[0] for row in ret]
+
+  def report(self):
+    with self.db.conn.cursor() as cur:
+      cur.execute('SELECT user_called, COUNT(*) AS n FROM hands WHERE cleared = TRUE GROUP BY user_called ORDER BY n DESC')
+      ret = cur.fetchall()
+      return [{'user_id': row[0], 'n': row[1]} for row in ret]
