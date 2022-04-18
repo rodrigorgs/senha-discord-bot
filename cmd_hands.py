@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from database import DatabaseHelper
 from db_hands import Hands
@@ -85,10 +86,9 @@ Comandos disponíveis para instrutores:
     await self.check_valid_channel(ctx)
 
     hands = Hands(self.db, ctx.message.guild.id)
-    ret = hands.list()
-    if ret:
-      user_list = [x[0] for x in ret]
-      user_enum_list = [f'{x[0] + 1}: {x[1]}' for x in enumerate(user_list)]
-      await ctx.message.channel.send('```' + '\n'.join(user_enum_list) + '```')
+    user_ids = hands.list()
+    if user_ids:
+      user_list = [f'{idx + 1}: <@!{user_id}>' for idx, user_id in enumerate(user_ids)]
+      await ctx.message.channel.send('\n'.join(user_list), allowed_mentions=discord.AllowedMentions(users=False))
     else:
       await ctx.message.channel.send('A fila está vazia.')

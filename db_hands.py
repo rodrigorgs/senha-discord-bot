@@ -77,11 +77,11 @@ class Hands:
 
   def list(self):
     with self.db.conn.cursor() as cur:
-      cur.execute('''SELECT user_name_raised
+      cur.execute('''SELECT user_raised
         FROM hands
         WHERE cleared = FALSE
           AND discord_server_id = %s
         ORDER BY id''',
         (self.discord_server_fk,))
       ret = cur.fetchall()
-      return ret
+      return [row[0] for row in ret]
