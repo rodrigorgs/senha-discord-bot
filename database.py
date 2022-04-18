@@ -30,7 +30,9 @@ class DatabaseHelper:
       cur.execute('''CREATE TABLE IF NOT EXISTS metadata (
         version INTEGER
       );''')
-      cur.execute('''INSERT INTO metadata(version) VALUES (0);''')
+      cur.execute('''SELECT COUNT(*) FROM metadata;''')
+      if cur.fetchone()[0] == 0:
+        cur.execute('''INSERT INTO metadata(version) VALUES (0);''')
 
   def schema_version(self):
     if self.table_exists('metadata'):
@@ -64,6 +66,7 @@ class DatabaseHelper:
 
   def migrate(self, version):
     print('Migrating to version {}...'.format(version))
+
     if version == 1:
       with self.conn.cursor() as cur:
         cur.execute('''CREATE TABLE IF NOT EXISTS hands (
@@ -76,10 +79,9 @@ class DatabaseHelper:
           user_name_called TEXT,
           cleared BOOLEAN DEFAULT FALSE
         );''')
-        self.create_metadata_table()
     elif version == 2:
       with self.conn.cursor() as cur:
-        cur.execute('''CREATE TABLE discord_server (
+        cur.execute('''CREATE TABLE IF EXISTS discord_server (
           id SERIAL PRIMARY KEY,
           name TEXT,
           guild_id NUMERIC,
@@ -97,4 +99,5 @@ class DatabaseHelper:
     print('Done.')
 
   def run_migrations(self):
+    self.create_metadata_table()
     self.update_schema_to_version(self.SCHEMA_VERSION)
