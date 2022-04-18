@@ -65,7 +65,7 @@ class StudentCmd(commands.Cog):
       student.set_team(ctx.message.author.id, equipe)
       await ctx.message.add_reaction('✅')
     except ValueError:
-      await ctx.send('Você precisa vincular seu usuário Discord a uma matrícula; para isso, use o comando `/checkin <matrícula>`')
+      await ctx.send('Você precisa vincular seu usuário Discord a uma matrícula; para isso, use o comando `/registrar <matrícula>`')
       return
 
   @commands.command(brief='Obtém informações personalizadas sobre a disciplina')
@@ -78,16 +78,16 @@ class StudentCmd(commands.Cog):
       await ctx.author.send(info)
     except ValueError as e:
       await ctx.message.add_reaction('❌')
-      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/checkin` para vincular sua conta.')
+      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/registrar` para vincular sua conta.')
 
   @commands.command(brief='Vincula sua conta do Discord a um número de matrícula')
-  async def checkin(self, ctx, arg=None):
+  async def registrar(self, ctx, arg=None):
     server = DiscordServer(self.db, ctx.message.guild.id)
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
 
     if arg is None:
       await ctx.message.add_reaction('❌')
-      await ctx.send(f'Uso: `/checkin N`, onde `N` é seu número de matrícula.')
+      await ctx.send(f'Uso: `/registrar N`, onde `N` é seu número de matrícula.')
     else:
       await ctx.message.add_reaction('⌛')
       
@@ -96,6 +96,9 @@ class StudentCmd(commands.Cog):
         student_name = ret[self.COL_STUDENT_NAME] or None
         await ctx.message.delete()
         await ctx.send(f'O usuário <@!{ctx.author.id}> foi vinculado ao estudante **{student_name}**.')
+        # Send info
+        info = student.get_info(ctx.author.id)
+        await ctx.author.send(info)
       except ValueError as e:
         await ctx.message.delete()
         await ctx.send(f'<@!{ctx.author.id}> {e}')
