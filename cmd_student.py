@@ -21,7 +21,7 @@ class StudentCmd(commands.Cog):
     msg = ''
     for team_id in sorted(teams.keys()):
       user_ids = teams[team_id]
-      user_mentions = [f'<@{user_id}>' for user_id in user_ids]
+      user_mentions = [f'<@!{user_id}>' for user_id in user_ids]
       msg += f'> **Equipe {team_id}**: ' + ', '.join(user_mentions) + '\n'
 
     if len(msg) == 0:
