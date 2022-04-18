@@ -28,12 +28,17 @@ class StudentSheet:
 
   def get_teams(self):
     teams = defaultdict(list)
-    team_ids = [int(x) for x in self.data_table.get_values_by_header(self.COL_TEAM_ID) if x.strip().isdigit()]
+    team_ids = [self.data_table.get_values_by_header(self.COL_TEAM_ID)]
     user_ids = self.data_table.get_values_by_header(self.COL_DISCORD_ID)
     for i in range(len(team_ids)):
-      team_id = team_ids[i]
-      user_id = user_ids[i]
-      teams[team_id].append(user_id)
+      try:
+        team_id = int(team_ids[i])
+        user_id = user_ids[i]
+        if user_id and len(user_id) > 0:
+          teams[team_id].append(user_id)
+      except ValueError:
+        pass
+      
     print('Teams: ', teams)
     return teams
 
