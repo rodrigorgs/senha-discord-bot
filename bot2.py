@@ -24,7 +24,7 @@ spreadsheet_helper = SpreadsheetHelper(GOOGLE_SERVICE_ACCOUNT_JSON)
 
 async def on_ready():
     print('Bot is online')
-bot = commands.Bot(command_prefix='/')
+bot = commands.Bot(command_prefix='?')
 bot.db = db
 bot.spreadsheet = spreadsheet_helper
 bot.add_cog(HandsCmd(bot))
