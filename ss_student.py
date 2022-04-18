@@ -34,6 +34,7 @@ class StudentSheet:
       team_id = team_ids[i]
       user_id = user_ids[i]
       teams[team_id].append(user_id)
+    print('Teams: ', teams)
     return teams
 
   def set_team(self, user_discord_id, team_id):
