@@ -37,45 +37,45 @@ class SpreadsheetHelper:
       self.data_tables[index] = dt
     return self.data_tables[index]
 
-class CachedDataTable:
-  def __init__(self, helper, spreadsheet_id, sheet_name, key_column_name):
-    self.helper = helper
-    self.sheet_name = sheet_name
-    self.sheet = self.helper.get_spreadsheet(spreadsheet_id).worksheet(self.sheet_name)
-    self.key_column_name = key_column_name
-    self.key_column_index = None
-    self.data = None
-    self.reload()
+# class CachedDataTable:
+#   def __init__(self, helper, spreadsheet_id, sheet_name, key_column_name):
+#     self.helper = helper
+#     self.sheet_name = sheet_name
+#     self.sheet = self.helper.get_spreadsheet(spreadsheet_id).worksheet(self.sheet_name)
+#     self.key_column_name = key_column_name
+#     self.key_column_index = None
+#     self.data = None
+#     self.reload()
 
-  def get_key_index(self, key):
-    keys = self.sheet.col_values(self.key_column_index)
-    return keys.index(key)
+#   def get_key_index(self, key):
+#     keys = self.sheet.col_values(self.key_column_index)
+#     return keys.index(key)
 
-  def get_values_by_key(self, key):
-    row = self.get_key_index(key)
-    values = self.data[row]
-    value_dict = {}
-    for i in range(len(self.col_headers)):
-      value_dict[self.col_headers[i]] = values[i]
-    return value_dict
+#   def get_values_by_key(self, key):
+#     row = self.get_key_index(key)
+#     values = self.data[row]
+#     value_dict = {}
+#     for i in range(len(self.col_headers)):
+#       value_dict[self.col_headers[i]] = values[i]
+#     return value_dict
 
-  def get_value_by_key_header(self, key, header):
-    value_dict = self.get_values_by_key(key)
-    return value_dict[header]
+#   def get_value_by_key_header(self, key, header):
+#     value_dict = self.get_values_by_key(key)
+#     return value_dict[header]
 
-  def set_value_by_key_header(self, key, header, value):
-    raise Exception('Not implemented yet')
+#   def set_value_by_key_header(self, key, header, value):
+#     raise Exception('Not implemented yet')
 
-  def reload(self):
-    self.data = self.sheet.get_all_values()
-    self.build_column_dict()
+#   def reload(self):
+#     self.data = self.sheet.get_all_values()
+#     self.build_column_dict()
 
-  def build_column_dict(self):
-    self.column_dict = {}
-    self.col_headers = self.data[0]
-    for i in range(len(self.col_headers)):
-      self.column_dict[self.col_headers[i]] = i + 1
-    self.key_column_index = self.column_dict[self.key_column_name]
+#   def build_column_dict(self):
+#     self.column_dict = {}
+#     self.col_headers = self.data[0]
+#     for i in range(len(self.col_headers)):
+#       self.column_dict[self.col_headers[i]] = i + 1
+#     self.key_column_index = self.column_dict[self.key_column_name]
 
 class DataTable:
   def __init__(self, helper, spreadsheet_id, sheet_name, key_column_name):
@@ -90,6 +90,8 @@ class DataTable:
     self.col_headers = self.sheet.row_values(1)
     for i in range(len(self.col_headers)):
       self.column_dict[self.col_headers[i]] = i + 1
+    print("col_headers: ", self.col_headers)
+    print("column dict: ", self.column_dict)
     self.key_column_index = self.column_dict[self.key_column_name]
 
   def __get_key_index(self, key):

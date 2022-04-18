@@ -38,11 +38,11 @@ class ConfigCmd(commands.Cog):
     server.set_spreadsheet_id(spreadsheet_id)
     await ctx.message.channel.send(f'Spreadsheet ID: {spreadsheet_id}')
 
-  @unibot.command(brief='Recarrega as configurações a partir da planilha')
-  @commands.has_role('Teacher')
-  async def reload(self, ctx):
-    server = DiscordServer(self.db, ctx.message.guild.id)
-    spreadsheet_id = server.get_spreadsheet_id()
-    config = ConfigSheet(self.helper, spreadsheet_id)
-    config.reload()
+  # @unibot.command(brief='Recarrega as configurações a partir da planilha')
+  # @commands.has_role('Teacher')
+  # async def reload(self, ctx):
+  #   server = DiscordServer(self.db, ctx.message.guild.id)
+  #   spreadsheet_id = server.get_spreadsheet_id()
+  #   config = ConfigSheet(self.helper, spreadsheet_id)
+  #   config.reload()
 
