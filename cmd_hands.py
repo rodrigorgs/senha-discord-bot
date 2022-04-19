@@ -3,6 +3,9 @@ from discord.ext import commands
 from database import DatabaseHelper
 from db_hands import Hands
 
+#DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+DOW = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB']
+
 # TODO: allow per-server configuration
 ROLE_TEACHER = 'Teacher'
 ALLOWED_CHANNELS = ['fila-atendimento', '__teste-bot']
@@ -95,12 +98,16 @@ Comandos disponíveis para instrutores:
     else:
       await ctx.message.channel.send('A fila está vazia.')
 
-  @h.command(brief='Exibe estatísticas de atendimento')
+  @h.group(brief='Exibe estatísticas de atendimento')
   async def report(self, ctx):
+    pass
+
+  @report.command(brief='Exibe estatísticas de atendimento por instrutor')
+  async def user(self, ctx):
     await self.check_role_teacher(ctx)
 
     hands = Hands(self.db, ctx.message.guild.id)
-    l = hands.report()
+    l = hands.report_user()
     await ctx.guild.chunk()
     msg = ''
     for row in l:
@@ -111,3 +118,27 @@ Comandos disponíveis para instrutores:
 
     msg = '''Número de atendimentos por usuário:\n\n''' + msg
     await ctx.send(msg, allowed_mentions=discord.AllowedMentions(users=False))
+
+  @report.command(brief='Exibe estatísticas de atendimento por hora do dia')
+  async def hour(self, ctx):
+    await self.check_role_teacher(ctx)
+
+    hands = Hands(self.db, ctx.message.guild.id)
+    l = hands.report_hour()
+    msg = "Atendimentos por hora do dia:\n\n"
+    if len(msg) == 0:
+      msg = 'Nada a reportar'
+    msg += '\n'.join([f'{int(x[0])}:00 => {x[1]}' for x in l])
+    await ctx.send(msg)
+
+  @report.command(brief='Exibe estatísticas de atendimento por dia da semana')
+  async def day(self, ctx):
+    await self.check_role_teacher(ctx)
+
+    hands = Hands(self.db, ctx.message.guild.id)
+    l = hands.report_day()
+    msg = "Atendimentos por dia da semana:\n\n"
+    if len(msg) == 0:
+      msg = 'Nada a reportar'
+    msg += '\n'.join([f'{DOW[int(x[0])]} => {x[1]}' for x in l])
+    await ctx.send(msg)

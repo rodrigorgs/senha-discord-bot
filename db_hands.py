@@ -86,7 +86,7 @@ class Hands:
       ret = cur.fetchall()
       return [row[0] for row in ret]
 
-  def report(self):
+  def report_user(self):
     with self.db.conn.cursor() as cur:
       cur.execute('''SELECT user_called, COUNT(*) AS n
         FROM hands
@@ -96,3 +96,35 @@ class Hands:
         (self.discord_server_fk,))
       ret = cur.fetchall()
       return [{'user_id': row[0], 'n': row[1]} for row in ret]
+
+  def report_hour(self):
+    with self.db.conn.cursor() as cur:
+      cur.execute('''
+        SELECT 
+          date_part('hour', time_raised) AS hour,
+          COUNT(*) AS n
+        FROM hands
+        WHERE cleared = TRUE
+          AND discord_server_id = %s
+        GROUP BY hour
+        ORDER BY hour;''',
+        (self.discord_server_fk,))
+      
+      ret = cur.fetchall()
+      return ret
+
+  def report_day(self):
+    with self.db.conn.cursor() as cur:
+      cur.execute('''
+        SELECT 
+          date_part('dow', time_raised) AS dow,
+          COUNT(*) AS n
+        FROM hands
+        WHERE cleared = TRUE
+          AND discord_server_id = %s
+        GROUP BY dow
+        ORDER BY dow;''',
+        (self.discord_server_fk,))
+      
+      ret = cur.fetchall()
+      return ret
