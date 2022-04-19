@@ -86,9 +86,11 @@ Comandos disponíveis para instrutores:
     await self.check_valid_channel(ctx)
 
     hands = Hands(self.db, ctx.message.guild.id)
+    await ctx.guild.chunk()
     user_ids = hands.list()
     if user_ids:
-      user_list = [f'{idx + 1}: <@!{user_id}>' for idx, user_id in enumerate(user_ids)]
+      users = [self.bot.get_user(x) for x in user_ids]
+      user_list = [f'{idx + 1}: {self.bot.get_user(id=user_id).display_name} (<@!{user_id}>)' for idx, user_id in enumerate(user_ids)]
       await ctx.message.channel.send('\n'.join(user_list), allowed_mentions=discord.AllowedMentions(users=False))
     else:
       await ctx.message.channel.send('A fila está vazia.')

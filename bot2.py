@@ -3,6 +3,7 @@
 # TODO: allow admin to configure spreadsheet id
 
 from discord.ext import commands
+import discord
 from database import DatabaseHelper
 from spreadsheet_helper import SpreadsheetHelper
 from cmd_config import ConfigCmd
@@ -24,7 +25,10 @@ spreadsheet_helper = SpreadsheetHelper(GOOGLE_SERVICE_ACCOUNT_JSON)
 
 async def on_ready():
     print('Bot is online')
-bot = commands.Bot(command_prefix='?')
+
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='?', intents=intents)
 bot.db = db
 bot.spreadsheet = spreadsheet_helper
 bot.add_cog(HandsCmd(bot))
