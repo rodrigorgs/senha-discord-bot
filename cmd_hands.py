@@ -111,7 +111,8 @@ Comandos disponíveis para instrutores:
     await ctx.guild.chunk()
     msg = ''
     for row in l:
-      msg += f'{row["n"]} — {self.bot.get_user(id=int(row["user_id"])).display_name} (<@{row["user_id"]}>)\n'
+      if user_id:
+        msg += f'{row["n"]} — {self.bot.get_user(id=int(row["user_id"])).display_name} (<@{row["user_id"]}>)\n'
 
     if len(msg) == 0:
       msg = 'Nada a reportar'
