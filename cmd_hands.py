@@ -129,7 +129,7 @@ Comandos disponíveis para instrutores:
     msg = "Atendimentos por hora do dia:\n\n"
     if len(msg) == 0:
       msg = 'Nada a reportar'
-    msg += '\n'.join([f'{int(x[0])}:00 => {x[1]}' for x in l])
+    msg += '\n'.join([f'`{str(int(x[0])).rjust(2)}:00` => {x[1]}' for x in l])
     await ctx.send(msg)
 
   @report.command(brief='Exibe estatísticas de atendimento por dia da semana')
