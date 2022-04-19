@@ -22,7 +22,8 @@ class StudentCmd(commands.Cog):
     await ctx.guild.chunk()
     for team_id in sorted(teams.keys()):
       user_ids = teams[team_id]
-      user_mentions = [f'{self.bot.get_user(id=int(user_id)).display_name} (<@!{user_id}>)' for user_id in user_ids]
+      # user_mentions = [f'{self.bot.get_user(id=int(user_id)).display_name} (<@!{user_id}>)' for user_id in user_ids]
+      user_mentions = [f'{self.bot.get_user(id=int(user_id)).display_name}' for user_id in user_ids]
       msg += f'> **Equipe {team_id}**: ' + ', '.join(user_mentions) + '\n'
 
     if len(msg) == 0:
