@@ -126,7 +126,7 @@ Comandos disponíveis para instrutores:
 
     hands = Hands(self.db, ctx.message.guild.id)
     l = hands.report_hour()
-    msg = "Atendimentos por hora do dia:\n\n"
+    msg = "Solicitações de atendimento por hora do dia:\n\n"
     if len(msg) == 0:
       msg = 'Nada a reportar'
     msg += '\n'.join([f'`{str(int(x[0])).rjust(2)}:00` => {x[1]}' for x in l])
@@ -138,7 +138,7 @@ Comandos disponíveis para instrutores:
 
     hands = Hands(self.db, ctx.message.guild.id)
     l = hands.report_day()
-    msg = "Atendimentos por dia da semana:\n\n"
+    msg = "Solicitações de atendimento por dia da semana:\n\n"
     if len(msg) == 0:
       msg = 'Nada a reportar'
     msg += '\n'.join([f'`{DOW[int(x[0])]}` => {x[1]}' for x in l])
