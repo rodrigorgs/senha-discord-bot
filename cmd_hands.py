@@ -141,5 +141,5 @@ Comandos disponíveis para instrutores:
     msg = "Atendimentos por dia da semana:\n\n"
     if len(msg) == 0:
       msg = 'Nada a reportar'
-    msg += '\n'.join([f'{DOW[int(x[0])]} => {x[1]}' for x in l])
+    msg += '\n'.join([f'`{DOW[int(x[0])]}` => {x[1]}' for x in l])
     await ctx.send(msg)
