@@ -55,7 +55,7 @@ class StudentCmd(commands.Cog):
       except Exception:
         raise commands.CommandError()
     except commands.CommandError:
-      await ctx.send('Uso: `?entra <equipe>`, onde <equipe> é um número de 1 a 20')
+      await ctx.send('Uso: `?equipe entrar <equipe>`, onde <equipe> é um número de 1 a 20')
       return
 
     server = DiscordServer(self.db, ctx.message.guild.id)
