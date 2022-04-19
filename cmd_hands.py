@@ -101,11 +101,13 @@ Comandos disponíveis para instrutores:
 
     hands = Hands(self.db, ctx.message.guild.id)
     l = hands.report()
+    await ctx.guild.chunk()
     msg = ''
     for row in l:
-      msg += f'<@{row["user_id"]}>: {row["n"]}\n'
+      msg += f'{row["n"]} — {self.bot.get_user(id=int(row["user_id"])).display_name} (<@{row["user_id"]}>)\n'
 
     if len(msg) == 0:
       msg = 'Nada a reportar'
 
+    msg = '''Número de atendimentos por usuário:\n\n''' + msg
     await ctx.send(msg, allowed_mentions=discord.AllowedMentions(users=False))
