@@ -30,7 +30,7 @@ class StudentCmd(commands.Cog):
       msg = 'Nenhuma equipe encontrada.\n'
     
     msg += '\nDigite `?equipes entrar <id da equipe>` para entrar em uma equipe.\n'
-    msg += '    (`<id da equipe>` é um número entre 1 e 20)\n'
+    msg += '    (`<id da equipe>` é um número entre 1 e 99)\n'
     msg += 'Digite `?equipes sair` para sair da sua equipe.\n'
 
     am = discord.AllowedMentions(users=False,)
@@ -51,12 +51,12 @@ class StudentCmd(commands.Cog):
         raise commands.CommandError()
       try:
         num_equipe = int(equipe)
-        if not 1 <= num_equipe <= 20:
+        if not 1 <= num_equipe <= 99:
           raise commands.CommandError()
       except Exception:
         raise commands.CommandError()
     except commands.CommandError:
-      await ctx.send('Uso: `?equipe entrar <equipe>`, onde <equipe> é um número de 1 a 20')
+      await ctx.send('Uso: `?equipe entrar <equipe>`, onde <equipe> é um número de 1 a 99')
       return
 
     server = DiscordServer(self.db, ctx.message.guild.id)
