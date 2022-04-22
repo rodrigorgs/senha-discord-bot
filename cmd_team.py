@@ -12,8 +12,8 @@ class TeamCmd(commands.Cog):
   @commands.command(brief='Comandos para equipes')
   async def equipe(self, ctx, team_id=None, attribute=None, value=None):
     # TODO: if attribute is None, list all attributes
-    if team_id is None or attribute is None:
-      await ctx.send('''Uso: `?equipe <id da equipe> <subcomando>`''')
+    if team_id is None:
+      await ctx.send('''Uso: `?equipe <id da equipe> [subcomando]`''')
       return
     
     server = DiscordServer(self.bot.db, ctx.message.guild.id)
@@ -21,7 +21,12 @@ class TeamCmd(commands.Cog):
 
     # TODO: escape attribute values for Discord
     try:
-      if value is None:
+      if attribute is None:
+        data = team.get_info(team_id)
+        await ctx.send(f'''**Equipe {team_id}**:''')
+        for k, v in data.items():
+          await ctx.send(f'''•  **{k}**: {v}''')
+      elif value is None:
         # Get attribute value
         attr_value = team.get_attribute(team_id, attribute)
         await ctx.send(f'''Equipe {team_id}: {attribute} = {attr_value}''')
