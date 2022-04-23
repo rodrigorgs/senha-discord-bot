@@ -35,7 +35,7 @@ class StudentSheet:
         team_id = int(team_ids[i])
         user_id = user_ids[i]
         if user_id and len(user_id) > 0:
-          teams[team_id].append(user_id)
+          teams[team_id].append(int(user_id))
       except ValueError:
         pass
       
