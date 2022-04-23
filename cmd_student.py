@@ -113,7 +113,7 @@ class StudentCmd(commands.Cog):
     team_channels_to_create = set([f'equipe{id}' for id in teams.keys()]) #- team_channels_current
     
     teacher_role = [x for x in ctx.guild.roles if x.name == f'Teacher'][0]
-    for channel_name in team_channels_to_create:
+    for channel_name in sorted(team_channels_to_create):
       team_id = int(channel_name.replace('equipe', ''))
       role = [x for x in ctx.guild.roles if x.name == f'Equipe{team_id}'][0]
       overwrites = {
@@ -123,16 +123,16 @@ class StudentCmd(commands.Cog):
       }
       # text channel
       if channel_name in team_channels_current:
-        channel = [x for x in ctx.guild.channels if x.name == channel_name and x.category == category][0]
-        await channel.edit(overwrites=overwrites, position=team_id)
-        # pass
+        # channel = [x for x in ctx.guild.channels if x.name == channel_name and x.category == category][0]
+        # await channel.edit(overwrites=overwrites, position=team_id)
+        pass
       else:
         await ctx.guild.create_text_channel(channel_name, category=category, overwrites=overwrites, position=team_id)
       # voice channel
       if f'{channel_name}-voz' in team_channels_current:
-        channel = [x for x in ctx.guild.channels if x.name == f'{channel_name}-voz' and x.category == category][0]
-        await channel.edit(overwrites=overwrites, position=100 + team_id)
-        # pass
+        # channel = [x for x in ctx.guild.channels if x.name == f'{channel_name}-voz' and x.category == category][0]
+        # await channel.edit(overwrites=overwrites, position=100 + team_id)
+        pass
       else:
         await ctx.guild.create_voice_channel(f'{channel_name}-voz', category=category, overwrites=overwrites, position=100 + team_id)
 
