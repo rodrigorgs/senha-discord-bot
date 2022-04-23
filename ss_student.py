@@ -23,7 +23,6 @@ class StudentSheet:
     try:
       return self.data_table.select_col_where_col_is_value(self.COL_TEAM_ID, self.COL_DISCORD_ID, user_discord_id)
     except Exception as e:
-      print(e)
       return None
 
   def get_teams(self):
@@ -39,7 +38,6 @@ class StudentSheet:
       except ValueError:
         pass
       
-    print('Teams: ', teams)
     return teams
 
   def set_team(self, user_discord_id, team_id):

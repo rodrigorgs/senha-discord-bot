@@ -34,7 +34,6 @@ class TeamCmd(commands.Cog):
         # Set attribute value (must be from team)
         student = StudentSheet(self.helper, server.get_spreadsheet_id())
         author_team = student.get_team(ctx.author.id)
-        print(f'Author team: {author_team}')
         if author_team != team_id:
           await ctx.message.add_reaction('❌')
           await ctx.send(f'''Você não está na equipe {team_id}''')
