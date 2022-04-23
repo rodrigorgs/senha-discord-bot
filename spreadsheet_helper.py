@@ -90,8 +90,6 @@ class DataTable:
     self.col_headers = self.sheet.row_values(1)
     for i in range(len(self.col_headers)):
       self.column_dict[self.col_headers[i]] = i + 1
-    print("col_headers: ", self.col_headers)
-    print("column dict: ", self.column_dict)
     self.key_column_index = self.column_dict[self.key_column_name]
 
   def __get_key_index(self, key):
