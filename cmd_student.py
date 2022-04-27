@@ -149,7 +149,7 @@ class StudentCmd(commands.Cog):
       await ctx.author.send(info)
     except ValueError as e:
       await ctx.message.add_reaction('❌')
-      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `?registrar <matrícula>` para vincular sua conta.')
+      await ctx.send(f'<@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `?registrar <matrícula>` para vincular sua conta, trocando `<matrícula>` pelo seu número de matrícula. Exemplo: `?registrar 200310593`')
 
   @commands.command(brief='Vincula sua conta do Discord a um número de matrícula')
   async def registrar(self, ctx, arg=None):
