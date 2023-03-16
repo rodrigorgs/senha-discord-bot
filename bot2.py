@@ -26,15 +26,28 @@ spreadsheet_helper = SpreadsheetHelper(GOOGLE_SERVICE_ACCOUNT_JSON)
 async def on_ready():
     print('Bot is online')
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 bot = commands.Bot(command_prefix='?', intents=intents)
 bot.db = db
 bot.spreadsheet = spreadsheet_helper
-bot.add_cog(HandsCmd(bot))
-bot.add_cog(ConfigCmd(bot))
-bot.add_cog(StudentCmd(bot))
-bot.add_cog(TeamCmd(bot))
+import asyncio
+asyncio.run(bot.add_cog(HandsCmd(bot)))
+asyncio.run(bot.add_cog(ConfigCmd(bot)))
+asyncio.run(bot.add_cog(StudentCmd(bot)))
+asyncio.run(bot.add_cog(TeamCmd(bot)))
+
+@bot.command(brief='Sincroniza comandos')
+@commands.has_role('Teacher')
+async def sync(ctx):
+    await ctx.bot.tree.sync()
+    await ctx.send('Comandos sincronizados')
+
+@bot.hybrid_command(brief='Hello')
+@commands.has_role('Teacher')
+async def hello(ctx):
+    pass
+
 print('Starting bot...')
 bot.add_listener(on_ready)
 bot.run(DISCORD_BOT_TOKEN)
