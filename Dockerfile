@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "/bin/bash", "-c", "source config.sh && python ./bot.py" ]
+CMD [ "/bin/bash", "-c", "source config.sh && python ./bot2.py" ]
