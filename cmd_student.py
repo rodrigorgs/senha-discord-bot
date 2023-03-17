@@ -3,6 +3,7 @@ from discord.ext import commands
 from spreadsheet_helper import SpreadsheetHelper
 from db_discord_server import DiscordServer
 from ss_student import StudentSheet
+from ss_attr import AttrSheet
 
 class StudentCmd(commands.Cog):
   COL_STUDENT_NAME = 'STUDENT_NAME'
@@ -137,6 +138,35 @@ class StudentCmd(commands.Cog):
   #       await ctx.guild.create_voice_channel(f'{channel_name}-voz', category=category, overwrites=overwrites, position=100 + team_id)
 
   #   await ctx.send('✅')
+
+  @commands.hybrid_command(brief='Obtém um dado')
+  async def get(self, ctx, attr):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    sheet = AttrSheet(self.helper, server.get_spreadsheet_id(), StudentSheet.SHEET_STUDENTS, StudentSheet.COL_DISCORD_ID)
+    try:
+      if attr == 'all':
+        value = sheet.get_all_attributes(ctx.author.id)
+        info = '\n'.join([f'**{k}**: {v}' for k, v in value.items()])
+      else:
+        value = sheet.get_attribute(ctx.author.id, attr)
+        info = f'**{attr}**: {value}'
+      await ctx.send(info, ephemeral=True)
+    except ValueError as e:
+      # TODO: improve error reporting
+      await ctx.send(f'❌ Erro', ephemeral=True)
+      print(e)
+
+  @commands.hybrid_command(brief='Altera um dado')
+  async def set(self, ctx, attr, value):
+    server = DiscordServer(self.db, ctx.message.guild.id)
+    sheet = AttrSheet(self.helper, server.get_spreadsheet_id(), StudentSheet.SHEET_STUDENTS, StudentSheet.COL_DISCORD_ID)
+    try:
+      info = sheet.set_attribute(ctx.author.id, attr, value)
+      await ctx.send(f'{attr}: {info}', ephemeral=True)
+    except ValueError as e:
+      # TODO: improve error reporting
+      await ctx.send(f'❌ Erro', ephemeral=True)
+      print(e)
 
 
   @commands.hybrid_command(brief='Obtém informações personalizadas sobre a disciplina')
