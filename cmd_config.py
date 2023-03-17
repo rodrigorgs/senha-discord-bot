@@ -15,10 +15,7 @@ class ConfigCmd(commands.Cog):
   @commands.hybrid_group(brief='Configurações do bot', fallback='help')
   @commands.has_role('Teacher')
   async def unibot(self, ctx):
-    if ctx.invoked_subcommand is None:
-      await ctx.send('''Comandos disponíveis:
-
-`?unibot set_spreadsheet_id <value>` - Define o ID da planilha do Google Drive''')
+    pass
 
   # @unibot.command(brief='Exibe a configuração atual')
   # @commands.has_role('Teacher')
@@ -32,10 +29,10 @@ class ConfigCmd(commands.Cog):
 
   @unibot.command(brief='Define o ID da planilha do Google Drive')
   @commands.has_role('Teacher')
-  async def set_spreadsheet_id(self, ctx, spreadsheet_id):
+  async def set_spreadsheet_id(self, ctx, id):
     server = DiscordServer(self.db, ctx.message.guild.id)
-    server.set_spreadsheet_id(spreadsheet_id)
-    await ctx.send(f'Spreadsheet ID: {spreadsheet_id}')
+    server.set_spreadsheet_id(id)
+    await ctx.send(f'Spreadsheet ID: {id}')
 
   @unibot.command(brief='Obtém o ID da planilha do Google Drive')
   @commands.has_role('Teacher')
