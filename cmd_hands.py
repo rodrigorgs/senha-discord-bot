@@ -17,16 +17,16 @@ class HandsCmd(commands.Cog):
 
   async def check_valid_channel(self, ctx):
     if ctx.channel.name not in ALLOWED_CHANNELS:
-      await ctx.message.channel.send('Use o canal #fila-atendimento')
+      await ctx.send('Use o canal #fila-atendimento')
       raise commands.CommandError('This command can only be run in fila-atendimento')
 
   async def check_role_teacher(self, ctx):
     user_roles = [x.name for x in ctx.author.roles]
     if ROLE_TEACHER not in user_roles:
-      await ctx.message.channel.send('Você não tem permissão para usar esse comando. Digite `?h up` se quiser entrar na fila.')
+      await ctx.send('Você não tem permissão para usar esse comando. Digite `?h up` se quiser entrar na fila.')
       raise commands.CommandError('This command can only be run in fila-atendimento')
 
-  @commands.group(brief='Comandos para a fila de atendimento')
+  @commands.hybrid_group(brief='Comandos para a fila de atendimento')
   async def h(self, ctx):
     if ctx.invoked_subcommand is None:
         await ctx.send('''Comandos disponíveis para todos:
@@ -43,62 +43,62 @@ Comandos disponíveis para instrutores:
   @h.command(brief='Entra na fila de atendimento')
   async def up(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
 
     try:
       hands.up(ctx.author.id, ctx.author.display_name)
-      await ctx.message.add_reaction('✅')
+      await ctx.send('✅')
     except ValueError as e:
-      await ctx.message.channel.send('Você já está na fila de atendimento. Aguarde a sua vez.')
+      await ctx.send('Você já está na fila de atendimento. Aguarde a sua vez.')
 
   @h.command(brief='Sai da fila de atendimento')
   async def down(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     hands.down(ctx.author.id)
-    await ctx.message.add_reaction('✅')
+    await ctx.send('✅')
   
   @h.command(brief='Chama o próximo da fila')
   async def next(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
 
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     user_raised = hands.next(ctx.author.id, ctx.author.display_name)
     if user_raised:
       voice_channel_text = ''
       voice_channel = ctx.author.voice
       if voice_channel is not None:
         voice_channel_text = f' no canal <#{voice_channel.channel.id}>'
-      await ctx.message.channel.send(f'<@!{user_raised}>, é a sua vez! Seu atendimento será feito por **{ctx.author.display_name}**{voice_channel_text}.')
+      await ctx.send(f'<@!{user_raised}>, é a sua vez! Seu atendimento será feito por **{ctx.author.display_name}**{voice_channel_text}.')
     else:
-      await ctx.message.channel.send('A fila está vazia.')
+      await ctx.send('A fila está vazia.')
 
   @h.command(brief='Limpa a fila')
   async def clear(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
     await self.check_role_teacher(ctx)
     
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     hands.clear();
-    await ctx.message.add_reaction('✅')
+    await ctx.send('✅')
 
   @h.command(brief='Lista os usuários na fila')
   async def list(self, ctx: commands.Context):
     await self.check_valid_channel(ctx)
 
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     await ctx.guild.chunk()
     user_ids = hands.list()
     if user_ids:
       users = [self.bot.get_user(x) for x in user_ids]
-      user_list = [f'{idx + 1}: {self.bot.get_user(id=user_id).display_name} (<@!{user_id}>)' for idx, user_id in enumerate(user_ids)]
-      await ctx.message.channel.send('\n'.join(user_list), allowed_mentions=discord.AllowedMentions(users=False))
+      user_list = [f'{idx + 1}: {self.bot.get_user(user_id).display_name} (<@!{user_id}>)' for idx, user_id in enumerate(user_ids)]
+      await ctx.send('\n'.join(user_list), allowed_mentions=discord.AllowedMentions(users=False))
     else:
-      await ctx.message.channel.send('A fila está vazia.')
+      await ctx.send('A fila está vazia.')
 
-  @h.group(brief='Exibe estatísticas de atendimento')
+  @commands.hybrid_group(brief='Exibe estatísticas de atendimento')
   async def report(self, ctx):
     pass
 
@@ -106,13 +106,13 @@ Comandos disponíveis para instrutores:
   async def user(self, ctx):
     await self.check_role_teacher(ctx)
 
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     l = hands.report_user()
     await ctx.guild.chunk()
     msg = ''
     for row in l:
       if row["user_id"]:
-        msg += f'{row["n"]} — {self.bot.get_user(id=int(row["user_id"])).display_name} (<@{row["user_id"]}>)\n'
+        msg += f'{row["n"]} — {self.bot.get_user(int(row["user_id"])).display_name} (<@{row["user_id"]}>)\n'
 
     if len(msg) == 0:
       msg = 'Nada a reportar'
@@ -124,7 +124,7 @@ Comandos disponíveis para instrutores:
   async def hour(self, ctx):
     await self.check_role_teacher(ctx)
 
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     l = hands.report_hour()
     msg = "Solicitações de atendimento por hora do dia:\n\n"
     if len(msg) == 0:
@@ -136,7 +136,7 @@ Comandos disponíveis para instrutores:
   async def day(self, ctx):
     await self.check_role_teacher(ctx)
 
-    hands = Hands(self.db, ctx.message.guild.id)
+    hands = Hands(self.db, ctx.interaction.guild.id)
     l = hands.report_day()
     msg = "Solicitações de atendimento por dia da semana:\n\n"
     if len(msg) == 0:

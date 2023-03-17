@@ -15,6 +15,8 @@ To create a Discord bot on Discord's developer portal, follow these steps:
 5. Customize your bot's settings by giving it a username and uploading an avatar image.
 6. Once you're satisfied with your bot's settings, click on the "Copy" button under "Token" to copy your bot's authentication token. This token will be used to connect your bot to Discord's API. Take note of this token, because it can only be displayed just after creation.
 
+TODO: Privileged Gateway Intents
+
 ## Configurando o acesso do bot ao Google Drive
 
 <https://gspread.readthedocs.io/en/latest/oauth2.html>
@@ -39,10 +41,23 @@ END
 )
 ```
 
-Inicie os containers Docker (será criado um container para o banco de dados PostgreSQL):
+Carregue as variáveis de ambiente:
 
 ```sh
-docker-compose up --build
+source config.sh
+```
+
+Você precisará de um banco de dados PostgreSQL em execução. Se não tiver, você pode criar um com o seguinte comando:
+
+```sh
+docker kill postgres; docker run --rm --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=1234 -d postgres
+```
+
+Inicie o bot:
+
+
+```sh
+python bot2.py
 ```
 
 Aguarde aparecer a mensagem `I am online`.
