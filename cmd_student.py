@@ -144,6 +144,7 @@ class StudentCmd(commands.Cog):
     server = DiscordServer(self.db, ctx.message.guild.id)
     sheet = AttrSheet(self.helper, server.get_spreadsheet_id(), StudentSheet.SHEET_STUDENTS, StudentSheet.COL_DISCORD_ID)
     try:
+      await ctx.defer(ephemeral=True)
       if attr == 'all':
         value = sheet.get_all_attributes(ctx.author.id)
         info = '\n'.join([f'**{k}**: {v}' for k, v in value.items()])
@@ -161,8 +162,9 @@ class StudentCmd(commands.Cog):
     server = DiscordServer(self.db, ctx.message.guild.id)
     sheet = AttrSheet(self.helper, server.get_spreadsheet_id(), StudentSheet.SHEET_STUDENTS, StudentSheet.COL_DISCORD_ID)
     try:
+      await ctx.defer(ephemeral=True)
       info = sheet.set_attribute(ctx.author.id, attr, value)
-      await ctx.send(f'{attr}: {info}', ephemeral=True)
+      await ctx.send(f'**{attr}**: {info}', ephemeral=True)
     except ValueError as e:
       # TODO: improve error reporting
       await ctx.send(f'❌ Erro', ephemeral=True)
@@ -174,6 +176,7 @@ class StudentCmd(commands.Cog):
     server = DiscordServer(self.db, ctx.message.guild.id)
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
     try:
+      await ctx.defer(ephemeral=True)
       info = student.get_info(ctx.author.id)
       await ctx.send(info, ephemeral=True)
     except ValueError as e:
@@ -187,7 +190,7 @@ class StudentCmd(commands.Cog):
     if num_matricula is None:
       await ctx.send(f'❌ Uso: `/registrar N`, onde `N` é seu número de matrícula.', ephemeral=True)
     else:
-      await ctx.send('⌛', ephemeral=True)
+      await ctx.defer(ephemeral=True)
       
       try:
         ret = student.link_account(ctx.author.id, num_matricula)
@@ -199,4 +202,4 @@ class StudentCmd(commands.Cog):
         await ctx.send(info, ephemeral=True)
       except ValueError as e:
         # await ctx.message.delete()
-        await ctx.send(f'<@!{ctx.author.id}> {e}', ephemeral=True)
+        await ctx.send(f'{e}', ephemeral=True)
