@@ -175,8 +175,7 @@ class StudentCmd(commands.Cog):
     student = StudentSheet(self.helper, server.get_spreadsheet_id())
     try:
       info = student.get_info(ctx.author.id)
-      await ctx.send('✅')
-      await ctx.author.send(info)
+      await ctx.send(info, ephemeral=True)
     except ValueError as e:
       await ctx.send(f'❌ <@!{ctx.author.id}> Sua conta no Discord não foi vinculada a um número de matrícula. Use o comando `/registrar <matrícula>` para vincular sua conta, trocando `<matrícula>` pelo seu número de matrícula. Exemplo: `/registrar 200310593`', ephemeral=True)
 
@@ -197,8 +196,7 @@ class StudentCmd(commands.Cog):
         await ctx.send(f'O usuário <@!{ctx.author.id}> foi vinculado ao estudante **{student_name}**.', ephemeral=True)
         # Send info
         info = student.get_info(ctx.author.id)
-        await ctx.send('✅')
-        await ctx.author.send(info)
+        await ctx.send(info, ephemeral=True)
       except ValueError as e:
         # await ctx.message.delete()
         await ctx.send(f'<@!{ctx.author.id}> {e}', ephemeral=True)
